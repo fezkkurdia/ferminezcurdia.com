@@ -1,5 +1,6 @@
-// Mobile navigation menu toggle
+// Mobile navigation menu toggle & High-Performance Masonry Layout
 document.addEventListener('DOMContentLoaded', () => {
+    // 1. Mobile Menu Toggle
     const menuToggle = document.getElementById('menu-toggle');
     const siteNav = document.getElementById('site-nav');
 
@@ -9,4 +10,78 @@ document.addEventListener('DOMContentLoaded', () => {
             menuToggle.setAttribute('aria-expanded', isOpen);
         });
     }
+
+    // 2. Masonry Gallery Layout Engine
+    initMasonry();
 });
+
+function initMasonry() {
+    const gallery = document.getElementById('photo-gallery');
+    if (!gallery || !gallery.classList.contains('masonry-grid')) return;
+
+    const items = Array.from(gallery.querySelectorAll('.gallery-item'));
+    if (!items.length) return;
+
+    function layout() {
+        const containerWidth = gallery.clientWidth;
+        if (!containerWidth) return;
+
+        // Determine column count based on available width
+        let cols = 1;
+        if (containerWidth >= 1400) {
+            cols = 4;
+        } else if (containerWidth >= 960) {
+            cols = 3;
+        } else if (containerWidth >= 580) {
+            cols = 2;
+        } else {
+            cols = 1;
+        }
+
+        const gap = containerWidth < 600 ? 8 : 12;
+        const totalGaps = (cols - 1) * gap;
+        const colWidth = (containerWidth - totalGaps) / cols;
+        const colHeights = new Array(cols).fill(0);
+
+        items.forEach(item => {
+            // Find column with the lowest current height
+            let minCol = 0;
+            for (let c = 1; c < cols; c++) {
+                if (colHeights[c] < colHeights[minCol]) {
+                    minCol = c;
+                }
+            }
+
+            const x = Math.round(minCol * (colWidth + gap));
+            const y = Math.round(colHeights[minCol]);
+
+            // Calculate height using the precomputed aspect ratio
+            const arStr = item.style.getPropertyValue('--aspect-ratio');
+            const ar = parseFloat(arStr) || 1.5;
+            const itemHeight = Math.round(colWidth / ar);
+
+            item.style.width = `${Math.round(colWidth)}px`;
+            item.style.height = `${itemHeight}px`;
+            item.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+            item.classList.add('laid-out');
+
+            colHeights[minCol] += itemHeight + gap;
+        });
+
+        const maxHeight = Math.max(...colHeights);
+        gallery.style.height = `${maxHeight}px`;
+    }
+
+    // Run layout immediately
+    layout();
+
+    // Re-run on window resize with debounce
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(layout, 50);
+    });
+
+    // Also run after all images have fully loaded in case of any font shifts
+    window.addEventListener('load', layout);
+}

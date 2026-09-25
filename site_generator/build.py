@@ -343,9 +343,6 @@ class SiteBuilder:
                     {menu_html}
                 </ul>
             </nav>
-            <footer id="site-footer">
-                <p>Página web diseñada por <a href="https://es.linkedin.com/in/inigoezcurdia" target="_blank" rel="noopener">Iñigo Ezcurdia</a>.</p>
-            </footer>
         </header>
         """
 
@@ -397,7 +394,7 @@ class SiteBuilder:
             for p in g["photos"]:
                 title_attr = p["title"].replace('"', '&quot;')
                 item_html = f"""
-                <div class="gallery-item" style="--aspect-ratio: {p['aspect_ratio']}; flex-grow: {p['aspect_ratio']};">
+                <div class="gallery-item" style="--aspect-ratio: {p['aspect_ratio']};">
                     <a href="{p['full_webp']}"
                        data-pswp-width="{p['width']}"
                        data-pswp-height="{p['height']}"
@@ -440,7 +437,7 @@ class SiteBuilder:
         {g_sidebar}
         <main id="main-content" class="gallery-main">
             <h1 class="gallery-title">{g['label']}</h1>
-            <div id="photo-gallery" class="pswp-gallery justified-grid">
+            <div id="photo-gallery" class="pswp-gallery masonry-grid">
                 {photos_block}
             </div>
         </main>

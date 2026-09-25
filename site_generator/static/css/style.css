@@ -225,21 +225,28 @@ body {
 }
 
 /* --------------------------------------------------------------------------
-   Photo Gallery - Justified Mosaic Grid
+   Photo Gallery - Masonry Grid Layout
    -------------------------------------------------------------------------- */
-.justified-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--gallery-gap);
+.masonry-grid {
+    position: relative;
+    width: 100%;
+    margin-top: 10px;
+    transition: height 0.25s ease;
 }
 
 .gallery-item {
-    height: var(--gallery-row-height);
-    flex-grow: var(--aspect-ratio, 1);
-    position: relative;
+    position: absolute;
+    top: 0;
+    left: 0;
     overflow: hidden;
     background-color: var(--card-bg);
-    border-radius: 1px;
+    border-radius: 2px;
+    opacity: 0;
+    transition: opacity 0.35s ease, transform 0.25s ease;
+}
+
+.gallery-item.laid-out {
+    opacity: 1;
 }
 
 .gallery-item a {
@@ -250,16 +257,20 @@ body {
     position: relative;
 }
 
+.gallery-item picture,
 .gallery-item img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
+}
+
+.gallery-item img {
     transition: transform 0.4s ease, filter 0.4s ease;
 }
 
 .gallery-item:hover img {
-    transform: scale(1.03);
+    transform: scale(1.035);
     filter: brightness(1.08);
 }
 
