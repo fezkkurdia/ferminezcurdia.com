@@ -12,7 +12,7 @@ import re
 import shutil
 import hashlib
 from pathlib import Path
-from PIL import Image, ImageOps, ExifTags
+from PIL import Image, ImageOps
 
 # Paths
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,7 +28,7 @@ METADATA_FILE = BASE_DIR / "existing_site_metadata.json"
 
 # Settings
 THUMB_HEIGHT = 360
-DISPLAY_MAX_DIM = 2048
+DISPLAY_MAX_DIM = 2560  # Ultra-crisp 4K/Retina display resolution
 JPG_QUALITY = 84
 WEBP_QUALITY = 82
 
@@ -95,8 +95,7 @@ class SiteBuilder:
     def process_image(self, src_path: Path, dest_gallery_dir: Path):
         """Generates thumb and display versions in both JPG and WebP format."""
         file_hash = compute_file_hash(src_path)
-        mtime = src_path.stat().st_mtime
-        cache_key = f"{src_path.name}_{file_hash}"
+        cache_key = f"{src_path.name}_{file_hash}_{DISPLAY_MAX_DIM}"
 
         thumb_dir = dest_gallery_dir / "thumbs"
         display_dir = dest_gallery_dir / "display"
@@ -123,7 +122,7 @@ class SiteBuilder:
             orig_w, orig_h = img.size
             title = get_exif_title(img)
 
-            # 1. Display version (max 2048px)
+            # 1. Display version (max 2560px for Retina / 4K)
             scale = min(1.0, DISPLAY_MAX_DIM / max(orig_w, orig_h))
             disp_w = int(orig_w * scale)
             disp_h = int(orig_h * scale)
@@ -173,11 +172,9 @@ class SiteBuilder:
         if not GALLERIES_DIR.exists():
             return []
 
-        # Gallery folders sorted by directory name
         folder_list = sorted([d for d in GALLERIES_DIR.iterdir() if d.is_dir()])
         galleries_data = []
 
-        # Standard gallery slug & label dictionary for known galleries
         slug_map = {
             "01_people": ("people", "PEOPLE"),
             "02_nature": ("nature", "NATURE"),
@@ -193,23 +190,18 @@ class SiteBuilder:
             if raw_name in slug_map:
                 slug, label = slug_map[raw_name]
             else:
-                # Custom user folder: e.g. 08_tokyo -> tokyo, TOKYO
                 clean = re.sub(r'^\d+[\s_-]*', '', raw_name)
                 slug = clean.lower().replace(" ", "-").replace("_", "-")
                 label = clean.replace("-", " ").replace("_", " ").upper()
 
-            # Find all image files
             extensions = {".jpg", ".jpeg", ".png", ".webp"}
             image_files = [f for f in folder.iterdir() if f.is_file() and f.suffix.lower() in extensions]
 
-            # Look up existing metadata list for ordering if available
             existing_meta_list = self.metadata.get(raw_name, [])
             meta_by_filename = {item.get("filename"): item for item in existing_meta_list if "filename" in item}
 
-            # Sort photos: if in existing metadata, keep that exact order, otherwise sort by filename
             def sort_key(f: Path):
                 if f.name in meta_by_filename:
-                    # Find index in existing_meta_list
                     for idx, m in enumerate(existing_meta_list):
                         if m.get("filename") == f.name:
                             return (0, idx)
@@ -247,6 +239,10 @@ class SiteBuilder:
             shutil.copytree(STATIC_SRC_DIR, dist_assets, dirs_exist_ok=True)
             print("  [Static] Copied static assets to dist/assets/")
 
+        # Copy favicon to root for browsers looking for /favicon.ico or /favicon.svg
+        if (STATIC_SRC_DIR / "favicon.svg").exists():
+            shutil.copy(STATIC_SRC_DIR / "favicon.svg", DIST_DIR / "favicon.svg")
+
         # 2. Write CNAME
         with open(DIST_DIR / "CNAME", "w", encoding="utf-8") as f:
             f.write("ferminezcurdia.com\n")
@@ -279,10 +275,9 @@ class SiteBuilder:
             photos = []
             for img_path in g["image_files"]:
                 info = self.process_image(img_path, g_dest_dir)
-                # Determine title
                 meta = g["meta_by_filename"].get(img_path.name, {})
                 title = meta.get("title") or info.get("exif_title") or format_title_from_filename(img_path.name)
-                
+
                 photos.append({
                     "filename": img_path.name,
                     "title": title,
@@ -311,17 +306,14 @@ class SiteBuilder:
 
     def get_sidebar_html(self, current_slug: str, galleries: list) -> str:
         menu_items = []
-        
-        # HOME link
+
         home_active = ' class="active"' if current_slug == "home" else ''
         menu_items.append(f'<li{home_active}><a href="/">HOME</a></li>')
 
-        # Gallery links
         for g in galleries:
             active = ' class="active"' if current_slug == g["slug"] else ''
             menu_items.append(f'<li{active}><a href="/{g["slug"]}/">{g["label"]}</a></li>')
 
-        # Flickr external link
         menu_items.append('<li><a href="https://www.flickr.com/photos/ezcurdia/albums" target="_blank" rel="noopener">FLICKR</a></li>')
 
         menu_html = "\n        ".join(menu_items)
@@ -350,6 +342,16 @@ class SiteBuilder:
         # 1. Render Home (index.html)
         home_sidebar = self.get_sidebar_html("home", galleries)
         slides_json = json.dumps(home_slides)
+        first_slide_jpg = home_slides[0]["jpg_url"] if home_slides else "/assets/images/home/display/1.jpg"
+
+        home_json_ld = json.dumps({
+            "@context": "https://schema.org",
+            "@type": "Person",
+            "name": "Fermín Ezcurdia",
+            "url": "https://ferminezcurdia.com/",
+            "jobTitle": "Fotógrafo",
+            "description": "Portfolio y galerías de fotografía de Fermín Ezcurdia."
+        }, ensure_ascii=False)
 
         home_html = f"""<!DOCTYPE html>
 <html lang="es">
@@ -359,10 +361,26 @@ class SiteBuilder:
     <title>Fermín Ezcurdia | Fotografía</title>
     <meta name="description" content="Portfolio y galerías de fotografía de Fermín Ezcurdia. Retratos, naturaleza, rituales, tradiciones, religiones y ciudades del mundo.">
     <link rel="canonical" href="https://ferminezcurdia.com/">
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+    <!-- Open Graph / Facebook / WhatsApp -->
+    <meta property="og:site_name" content="Fermín Ezcurdia">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Fermín Ezcurdia | Fotografía">
+    <meta property="og:description" content="Portfolio y galerías de fotografía de Fermín Ezcurdia. Retratos, naturaleza, rituales y culturas del mundo.">
+    <meta property="og:url" content="https://ferminezcurdia.com/">
+    <meta property="og:image" content="https://ferminezcurdia.com{first_slide_jpg}">
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Fermín Ezcurdia | Fotografía">
+    <meta name="twitter:description" content="Portfolio y galerías de fotografía de Fermín Ezcurdia.">
+    <meta name="twitter:image" content="https://ferminezcurdia.com{first_slide_jpg}">
     <link rel="stylesheet" href="/assets/css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Droid+Serif:ital,wght@0,400;0,700;1,400&family=Oswald:wght@300;400;500&display=swap" rel="stylesheet">
+    <script type="application/ld+json">
+    {home_json_ld}
+    </script>
 </head>
 <body class="page-home">
     <div id="layout-container">
@@ -384,12 +402,20 @@ class SiteBuilder:
         print("  [Render] Generated dist/index.html")
 
         # 2. Render Galleries
-        for g in galleries:
+        num_galleries = len(galleries)
+        for idx, g in enumerate(galleries):
             g_dir = DIST_DIR / g["slug"]
             g_dir.mkdir(parents=True, exist_ok=True)
             g_sidebar = self.get_sidebar_html(g["slug"], galleries)
 
-            # Photos HTML for PhotoSwipe v5 Justified Grid
+            # Circular pagination
+            prev_g = galleries[(idx - 1) % num_galleries]
+            next_g = galleries[(idx + 1) % num_galleries]
+
+            # Representative cover image for social sharing
+            cover_photo = g["photos"][0]["full_jpg"] if g["photos"] else first_slide_jpg
+
+            # Photos HTML for PhotoSwipe v5 Masonry Grid
             photos_html_list = []
             for p in g["photos"]:
                 title_attr = p["title"].replace('"', '&quot;')
@@ -418,19 +444,47 @@ class SiteBuilder:
 
             photos_block = "\n".join(photos_html_list)
 
+            gallery_json_ld = json.dumps({
+                "@context": "https://schema.org",
+                "@type": "ImageGallery",
+                "name": g["label"],
+                "url": f"https://ferminezcurdia.com/{g['slug']}/",
+                "creator": {
+                    "@type": "Person",
+                    "name": "Fermín Ezcurdia",
+                    "url": "https://ferminezcurdia.com/"
+                }
+            }, ensure_ascii=False)
+
             gallery_html = f"""<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{g['label']} | Fermín Ezcurdia</title>
-    <meta name="description" content="Galería fotográfica {g['label']} de Fermín Ezcurdia.">
+    <meta name="description" content="Galería fotográfica {g['label']} de Fermín Ezcurdia. Fotografías originales en alta definición.">
     <link rel="canonical" href="https://ferminezcurdia.com/{g['slug']}/">
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+    <!-- Open Graph / Facebook / WhatsApp -->
+    <meta property="og:site_name" content="Fermín Ezcurdia">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="{g['label']} | Fermín Ezcurdia">
+    <meta property="og:description" content="Galería de fotografía {g['label']} por Fermín Ezcurdia.">
+    <meta property="og:url" content="https://ferminezcurdia.com/{g['slug']}/">
+    <meta property="og:image" content="https://ferminezcurdia.com{cover_photo}">
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{g['label']} | Fermín Ezcurdia">
+    <meta name="twitter:description" content="Galería fotográfica {g['label']} de Fermín Ezcurdia.">
+    <meta name="twitter:image" content="https://ferminezcurdia.com{cover_photo}">
     <link rel="stylesheet" href="/assets/css/style.css">
     <link rel="stylesheet" href="/assets/vendor/photoswipe/photoswipe.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Droid+Serif:ital,wght@0,400;0,700;1,400&family=Oswald:wght@300;400;500&display=swap" rel="stylesheet">
+    <script type="application/ld+json">
+    {gallery_json_ld}
+    </script>
 </head>
 <body class="page-gallery">
     <div id="layout-container">
@@ -440,8 +494,25 @@ class SiteBuilder:
             <div id="photo-gallery" class="pswp-gallery masonry-grid">
                 {photos_block}
             </div>
+            <!-- End of gallery navigation -->
+            <nav class="gallery-pagination">
+                <a href="/{prev_g['slug']}/" class="pagination-link prev">
+                    <span class="pagination-sub">Galería anterior</span>
+                    <span class="pagination-title">← {prev_g['label']}</span>
+                </a>
+                <a href="/{next_g['slug']}/" class="pagination-link next">
+                    <span class="pagination-sub">Siguiente galería</span>
+                    <span class="pagination-title">{next_g['label']} →</span>
+                </a>
+            </nav>
         </main>
     </div>
+    <!-- Floating Back to Top Button -->
+    <button id="back-to-top" aria-label="Volver arriba" title="Volver arriba">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="18 15 12 9 6 15"></polyline>
+        </svg>
+    </button>
     <script type="module">
         import PhotoSwipeLightbox from '/assets/vendor/photoswipe/photoswipe-lightbox.esm.min.js';
         const lightbox = new PhotoSwipeLightbox({{
@@ -449,7 +520,7 @@ class SiteBuilder:
             children: 'a',
             pswpModule: () => import('/assets/vendor/photoswipe/photoswipe.esm.min.js'),
             padding: {{ top: 20, bottom: 40, left: 20, right: 20 }},
-            bgOpacity: 0.92,
+            bgOpacity: 0.94,
             wheelToZoom: true
         }});
 
@@ -478,6 +549,15 @@ class SiteBuilder:
                             el.style.display = 'none';
                         }}
                     }});
+                }}
+            }});
+        }});
+
+        // High-res Image Protection in Lightbox: disable right-click contextmenu on high-res photos
+        lightbox.on('afterInit', () => {{
+            lightbox.pswp.element.addEventListener('contextmenu', (e) => {{
+                if (e.target.tagName === 'IMG' || e.target.closest('.pswp__img')) {{
+                    e.preventDefault();
                 }}
             }});
         }});

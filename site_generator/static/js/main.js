@@ -1,4 +1,4 @@
-// Mobile navigation menu toggle & High-Performance Masonry Layout
+// Mobile navigation menu toggle, Masonry Layout & Back-to-Top Button
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Mobile Menu Toggle
     const menuToggle = document.getElementById('menu-toggle');
@@ -11,7 +11,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 2. Masonry Gallery Layout Engine
+    // 2. Back to top button
+    const backToTop = document.getElementById('back-to-top');
+    if (backToTop) {
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 450) {
+                backToTop.classList.add('visible');
+            } else {
+                backToTop.classList.remove('visible');
+            }
+        }, { passive: true });
+
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+
+    // 3. Masonry Gallery Layout Engine
     initMasonry();
 });
 
@@ -77,6 +93,6 @@ function initMasonry() {
         resizeTimer = setTimeout(layout, 50);
     });
 
-    // Also run after all images have fully loaded in case of any font shifts
+    // Also run after all images have fully loaded in case of late font render
     window.addEventListener('load', layout);
 }
