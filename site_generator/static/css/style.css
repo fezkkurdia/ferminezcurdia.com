@@ -357,10 +357,10 @@ body {
         position: relative;
         width: 100%;
         height: auto;
-        padding: 20px 24px;
+        bottom: auto;
+        padding: 18px 24px;
         background-color: rgba(18, 18, 18, 0.95);
         border-right: none;
-        border-bottom: 1px solid var(--sidebar-border);
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
     }
 
@@ -369,8 +369,12 @@ body {
         top: 0;
         left: 0;
         right: 0;
+        bottom: auto;
+        height: auto;
         z-index: 100;
-        background-color: rgba(14, 14, 14, 0.7);
+        background-color: rgba(14, 14, 14, 0.75);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
     }
 
     .branding {
