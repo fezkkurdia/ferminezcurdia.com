@@ -26,15 +26,10 @@ function initMasonry() {
         const containerWidth = gallery.clientWidth;
         if (!containerWidth) return;
 
-        // Determine column count based on available width
-        let cols = 1;
-        if (containerWidth >= 1400) {
-            cols = 4;
-        } else if (containerWidth >= 960) {
-            cols = 3;
-        } else if (containerWidth >= 580) {
-            cols = 2;
-        } else {
+        // Determine column count dynamically to fill the entire screen width
+        // Target column width is ~330px for high-definition photo viewing
+        let cols = Math.max(1, Math.round(containerWidth / 330));
+        if (containerWidth < 550) {
             cols = 1;
         }
 

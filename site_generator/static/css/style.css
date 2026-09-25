@@ -172,7 +172,7 @@ body {
 
 .gallery-main {
     padding: 45px 35px 70px 45px;
-    max-width: 1700px;
+    width: 100%;
 }
 
 .gallery-title {
