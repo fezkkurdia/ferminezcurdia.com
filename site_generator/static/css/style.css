@@ -302,24 +302,38 @@ body {
    PhotoSwipe v5 Custom Caption & Theme Adjustments
    -------------------------------------------------------------------------- */
 .pswp__custom-caption {
-    background: rgba(10, 10, 10, 0.8);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    color: #f0f0f0;
+    background: rgba(14, 14, 14, 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: #ffffff;
     font-size: 15px;
     font-family: var(--font-heading);
-    padding: 10px 22px;
-    border-radius: 3px;
+    padding: 10px 26px;
+    border-radius: 4px;
     position: absolute;
     bottom: 24px;
     left: 50%;
     transform: translateX(-50%);
     max-width: 85%;
+    width: max-content;
+    white-space: nowrap;
     text-align: center;
     pointer-events: none;
-    letter-spacing: 0.5px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+    letter-spacing: 0.8px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
+    z-index: 1050;
+    line-height: 1.4;
+}
+
+@media (max-width: 600px) {
+    .pswp__custom-caption {
+        white-space: normal;
+        width: auto;
+        bottom: 16px;
+        font-size: 13px;
+        padding: 8px 16px;
+    }
 }
 
 /* --------------------------------------------------------------------------

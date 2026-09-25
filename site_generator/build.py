@@ -460,8 +460,9 @@ class SiteBuilder:
                 order: 9,
                 isButton: false,
                 appendTo: 'root',
-                html: 'Caption text',
+                html: '',
                 onInit: (el, pswp) => {{
+                    el.style.display = 'none';
                     lightbox.pswp.on('change', () => {{
                         const currSlide = lightbox.pswp.currSlide;
                         let captionText = '';
@@ -469,7 +470,13 @@ class SiteBuilder:
                             const img = currSlide.data.element.querySelector('img');
                             if (img) captionText = img.getAttribute('alt') || '';
                         }}
-                        el.innerHTML = captionText ? `<div class="pswp__custom-caption">${{captionText}}</div>` : '';
+                        if (captionText) {{
+                            el.textContent = captionText;
+                            el.style.display = 'block';
+                        }} else {{
+                            el.textContent = '';
+                            el.style.display = 'none';
+                        }}
                     }});
                 }}
             }});
