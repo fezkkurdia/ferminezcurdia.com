@@ -65,8 +65,8 @@ body {
     flex-direction: column;
     justify-content: space-between;
     z-index: 100;
-    border-right: 1px solid var(--sidebar-border);
-    box-shadow: var(--sidebar-shadow);
+    border-right: none;
+    box-shadow: 4px 0 25px rgba(0, 0, 0, 0.45);
 }
 
 .branding .site-title {
