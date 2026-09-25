@@ -191,6 +191,11 @@ body {
 .page-home {
     background-color: #0c0c0c;
     overflow: hidden;
+    --sidebar-width: auto;
+}
+
+.page-home #site-header {
+    width: auto;
 }
 
 .home-main {
