@@ -330,7 +330,7 @@ class SiteBuilder:
         <header id="site-header">
             <div class="branding">
                 <a href="/" class="site-title">
-                    <h1>Fermín Ezcurdia</h1>
+                    <h1>Fermín<br>Ezcurdia</h1>
                 </a>
                 <button id="menu-toggle" aria-label="Abrir menú" aria-expanded="false">
                     <span></span>
