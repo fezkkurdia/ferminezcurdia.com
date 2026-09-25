@@ -1,0 +1,354 @@
+/* ==========================================================================
+   ferminezcurdia.com - Modern Static Portfolio Stylesheet
+   Preserves the elegant, minimalist aesthetic of the original Photocrati site
+   ========================================================================== */
+
+:root {
+    --bg-color: #ffffff;
+    --text-color: #333333;
+    --text-muted: #888888;
+    --link-hover: #000000;
+    --active-link: #111111;
+    --border-color: #eaeaea;
+    --sidebar-width: 250px;
+    --font-heading: 'Droid Serif', Georgia, serif;
+    --font-nav: 'Oswald', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-body: 'Droid Serif', Georgia, serif;
+    --gallery-row-height: 180px;
+    --gallery-gap: 6px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+/* --------------------------------------------------------------------------
+   Layout Structure
+   -------------------------------------------------------------------------- */
+#layout-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* --------------------------------------------------------------------------
+   Sidebar Header & Navigation (Fixed on Desktop)
+   -------------------------------------------------------------------------- */
+#site-header {
+    width: var(--sidebar-width);
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px);
+    padding: 40px 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    z-index: 100;
+    border-right: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.branding .site-title {
+    text-decoration: none;
+    color: #222222;
+}
+
+.branding .site-title h1 {
+    font-family: var(--font-heading);
+    font-size: 26px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    line-height: 1.2;
+    margin-bottom: 30px;
+}
+
+/* Mobile menu toggle */
+#menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+}
+
+#menu-toggle span {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background-color: #222;
+    margin: 5px 0;
+    transition: 0.3s;
+}
+
+/* Navigation List */
+#site-nav ul {
+    list-style: none;
+}
+
+#site-nav li {
+    margin-bottom: 12px;
+}
+
+#site-nav a {
+    font-family: var(--font-nav);
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #666666;
+    text-decoration: none;
+    transition: color 0.2s ease, letter-spacing 0.2s ease;
+    display: inline-block;
+}
+
+#site-nav a:hover {
+    color: #000000;
+    letter-spacing: 2px;
+}
+
+#site-nav li.active a {
+    color: #000000;
+    font-weight: 500;
+    border-bottom: 1px solid #000000;
+    padding-bottom: 2px;
+}
+
+/* Footer Credit */
+#site-footer {
+    margin-top: 30px;
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: sans-serif;
+    line-height: 1.4;
+}
+
+#site-footer a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px dotted #bbb;
+}
+
+#site-footer a:hover {
+    color: #222;
+}
+
+/* --------------------------------------------------------------------------
+   Main Content Area
+   -------------------------------------------------------------------------- */
+#main-content {
+    margin-left: var(--sidebar-width);
+    flex: 1;
+    min-width: 0;
+}
+
+.gallery-main {
+    padding: 40px 30px 60px 40px;
+    max-width: 1600px;
+}
+
+.gallery-title {
+    font-family: var(--font-heading);
+    font-size: 28px;
+    font-weight: 400;
+    margin-bottom: 25px;
+    letter-spacing: 1px;
+    color: #1a1a1a;
+}
+
+/* --------------------------------------------------------------------------
+   Home Page Fullscreen Slideshow
+   -------------------------------------------------------------------------- */
+.page-home #site-header {
+    background-color: rgba(255, 255, 255, 0.88);
+}
+
+.home-main {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    z-index: 1;
+}
+
+#slideshow-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background-color: #111;
+}
+
+.slide-item {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    transition: opacity 1.2s ease-in-out;
+}
+
+.slide-item.active {
+    opacity: 1;
+}
+
+/* --------------------------------------------------------------------------
+   Photo Gallery - Justified Mosaic Grid
+   -------------------------------------------------------------------------- */
+.justified-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gallery-gap);
+}
+
+.gallery-item {
+    height: var(--gallery-row-height);
+    flex-grow: var(--aspect-ratio, 1);
+    position: relative;
+    overflow: hidden;
+    background-color: #f5f5f5;
+    border-radius: 1px;
+}
+
+.gallery-item a {
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+    position: relative;
+}
+
+.gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease, filter 0.4s ease;
+}
+
+.gallery-item:hover img {
+    transform: scale(1.03);
+    filter: brightness(1.04);
+}
+
+/* Hover caption overlay (subtle) */
+.caption-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 8px 12px;
+    background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 100%);
+    color: #ffffff;
+    font-size: 12px;
+    font-family: var(--font-heading);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.gallery-item:hover .caption-overlay {
+    opacity: 1;
+}
+
+/* --------------------------------------------------------------------------
+   PhotoSwipe v5 Custom Caption Styling
+   -------------------------------------------------------------------------- */
+.pswp__custom-caption {
+    background: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    font-size: 15px;
+    font-family: var(--font-heading);
+    padding: 8px 18px;
+    border-radius: 4px;
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 80%;
+    text-align: center;
+    pointer-events: none;
+    letter-spacing: 0.5px;
+}
+
+/* --------------------------------------------------------------------------
+   Responsive Mobile Adjustments
+   -------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+    :root {
+        --gallery-row-height: 140px;
+    }
+
+    #layout-container {
+        flex-direction: column;
+    }
+
+    #site-header {
+        position: relative;
+        width: 100%;
+        height: auto;
+        padding: 20px 24px;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .branding {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .branding .site-title h1 {
+        margin-bottom: 0;
+        font-size: 22px;
+    }
+
+    #menu-toggle {
+        display: block;
+    }
+
+    #site-nav {
+        display: none;
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px solid var(--border-color);
+    }
+
+    #site-nav.open {
+        display: block;
+    }
+
+    #site-footer {
+        display: none;
+    }
+
+    #main-content {
+        margin-left: 0;
+    }
+
+    .gallery-main {
+        padding: 25px 15px 40px 15px;
+    }
+
+    .gallery-title {
+        font-size: 22px;
+        margin-bottom: 18px;
+    }
+}

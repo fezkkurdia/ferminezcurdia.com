@@ -1,0 +1,17 @@
+# Build and generated outputs
+dist/
+.cache/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+
+# System and logs
+.system_generated/
+*.log
+.DS_Store
+Thumbs.db
