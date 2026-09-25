@@ -354,24 +354,30 @@ body {
     }
 
     #site-header {
-        position: relative;
+        position: sticky;
+        top: 0;
+        left: 0;
+        right: 0;
         width: 100%;
         height: auto;
         bottom: auto;
-        padding: 18px 24px;
-        background-color: rgba(18, 18, 18, 0.95);
+        padding: 16px 24px;
+        background-color: rgba(18, 18, 18, 0.88);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
         border-right: none;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+        z-index: 1000;
     }
 
     .page-home #site-header {
-        position: absolute;
+        position: fixed;
         top: 0;
         left: 0;
         right: 0;
         bottom: auto;
         height: auto;
-        z-index: 100;
+        z-index: 1000;
         background-color: rgba(14, 14, 14, 0.75);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
@@ -394,9 +400,11 @@ body {
 
     #site-nav {
         display: none;
-        margin-top: 20px;
+        margin-top: 15px;
         padding-top: 15px;
-        border-top: 1px solid var(--sidebar-border);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        max-height: calc(100vh - 80px);
+        overflow-y: auto;
     }
 
     #site-nav.open {
