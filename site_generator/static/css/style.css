@@ -1,15 +1,21 @@
 /* ==========================================================================
-   ferminezcurdia.com - Modern Static Portfolio Stylesheet
-   Preserves the elegant, minimalist aesthetic of the original Photocrati site
+   ferminezcurdia.com - Dark Portfolio Stylesheet (Photocrati Original Aesthetic)
+   Dark background, semi-transparent overlay sidebar over hero slideshow,
+   high-contrast white/light typography for optimal photographic viewing.
    ========================================================================== */
 
 :root {
-    --bg-color: #ffffff;
-    --text-color: #333333;
+    --bg-color: #161616;
+    --card-bg: #222222;
+    --text-color: #e6e6e6;
     --text-muted: #888888;
-    --link-hover: #000000;
-    --active-link: #111111;
-    --border-color: #eaeaea;
+    --text-title: #ffffff;
+    --link-color: #9e9e9e;
+    --link-hover: #ffffff;
+    --active-link: #ffffff;
+    --sidebar-bg: rgba(14, 14, 14, 0.65);
+    --sidebar-border: rgba(255, 255, 255, 0.08);
+    --sidebar-shadow: 0 0 25px rgba(0, 0, 0, 0.7);
     --sidebar-width: 250px;
     --font-heading: 'Droid Serif', Georgia, serif;
     --font-nav: 'Oswald', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -39,10 +45,11 @@ body {
 #layout-container {
     display: flex;
     min-height: 100vh;
+    position: relative;
 }
 
 /* --------------------------------------------------------------------------
-   Sidebar Header & Navigation (Fixed on Desktop)
+   Sidebar Header & Navigation (Fixed on Desktop, Translucent Dark)
    -------------------------------------------------------------------------- */
 #site-header {
     width: var(--sidebar-width);
@@ -50,19 +57,22 @@ body {
     top: 0;
     left: 0;
     bottom: 0;
-    background-color: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(8px);
-    padding: 40px 30px;
+    background-color: var(--sidebar-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 45px 30px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     z-index: 100;
-    border-right: 1px solid rgba(0, 0, 0, 0.04);
+    border-right: 1px solid var(--sidebar-border);
+    box-shadow: var(--sidebar-shadow);
 }
 
 .branding .site-title {
     text-decoration: none;
-    color: #222222;
+    color: var(--text-title);
+    display: block;
 }
 
 .branding .site-title h1 {
@@ -71,7 +81,9 @@ body {
     font-weight: 400;
     letter-spacing: 0.5px;
     line-height: 1.2;
-    margin-bottom: 30px;
+    color: #ffffff;
+    margin-bottom: 35px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
 }
 
 /* Mobile menu toggle */
@@ -87,7 +99,7 @@ body {
     display: block;
     width: 24px;
     height: 2px;
-    background-color: #222;
+    background-color: #ffffff;
     margin: 5px 0;
     transition: 0.3s;
 }
@@ -98,31 +110,33 @@ body {
 }
 
 #site-nav li {
-    margin-bottom: 12px;
+    margin-bottom: 14px;
 }
 
 #site-nav a {
     font-family: var(--font-nav);
     font-size: 13px;
     font-weight: 400;
-    letter-spacing: 1.5px;
+    letter-spacing: 2px;
     text-transform: uppercase;
-    color: #666666;
+    color: var(--link-color);
     text-decoration: none;
-    transition: color 0.2s ease, letter-spacing 0.2s ease;
+    transition: color 0.25s ease, letter-spacing 0.25s ease, transform 0.25s ease;
     display: inline-block;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
 }
 
 #site-nav a:hover {
-    color: #000000;
-    letter-spacing: 2px;
+    color: var(--link-hover);
+    letter-spacing: 2.5px;
+    transform: translateX(2px);
 }
 
 #site-nav li.active a {
-    color: #000000;
+    color: var(--active-link);
     font-weight: 500;
-    border-bottom: 1px solid #000000;
-    padding-bottom: 2px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.8);
+    padding-bottom: 3px;
 }
 
 /* Footer Credit */
@@ -130,18 +144,21 @@ body {
     margin-top: 30px;
     font-size: 11px;
     color: var(--text-muted);
-    font-family: sans-serif;
-    line-height: 1.4;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.5;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
 }
 
 #site-footer a {
-    color: inherit;
+    color: #aaaaaa;
     text-decoration: none;
-    border-bottom: 1px dotted #bbb;
+    border-bottom: 1px dotted #555555;
+    transition: color 0.2s ease;
 }
 
 #site-footer a:hover {
-    color: #222;
+    color: #ffffff;
+    border-bottom-color: #ffffff;
 }
 
 /* --------------------------------------------------------------------------
@@ -154,24 +171,26 @@ body {
 }
 
 .gallery-main {
-    padding: 40px 30px 60px 40px;
-    max-width: 1600px;
+    padding: 45px 35px 70px 45px;
+    max-width: 1700px;
 }
 
 .gallery-title {
     font-family: var(--font-heading);
     font-size: 28px;
     font-weight: 400;
-    margin-bottom: 25px;
-    letter-spacing: 1px;
-    color: #1a1a1a;
+    margin-bottom: 28px;
+    letter-spacing: 1.5px;
+    color: var(--text-title);
+    text-transform: uppercase;
 }
 
 /* --------------------------------------------------------------------------
    Home Page Fullscreen Slideshow
    -------------------------------------------------------------------------- */
-.page-home #site-header {
-    background-color: rgba(255, 255, 255, 0.88);
+.page-home {
+    background-color: #0c0c0c;
+    overflow: hidden;
 }
 
 .home-main {
@@ -181,14 +200,14 @@ body {
     width: 100vw;
     height: 100vh;
     overflow: hidden;
-    z-index: 1;
+    z-index: 0; /* Placed cleanly behind the sidebar */
 }
 
 #slideshow-container {
     width: 100%;
     height: 100%;
     position: relative;
-    background-color: #111;
+    background-color: #0c0c0c;
 }
 
 .slide-item {
@@ -198,7 +217,7 @@ body {
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;
-    transition: opacity 1.2s ease-in-out;
+    transition: opacity 1.4s ease-in-out;
 }
 
 .slide-item.active {
@@ -219,7 +238,7 @@ body {
     flex-grow: var(--aspect-ratio, 1);
     position: relative;
     overflow: hidden;
-    background-color: #f5f5f5;
+    background-color: var(--card-bg);
     border-radius: 1px;
 }
 
@@ -241,7 +260,7 @@ body {
 
 .gallery-item:hover img {
     transform: scale(1.03);
-    filter: brightness(1.04);
+    filter: brightness(1.08);
 }
 
 /* Hover caption overlay (subtle) */
@@ -250,15 +269,15 @@ body {
     bottom: 0;
     left: 0;
     right: 0;
-    padding: 8px 12px;
-    background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 100%);
+    padding: 10px 12px;
+    background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 70%, transparent 100%);
     color: #ffffff;
     font-size: 12px;
     font-family: var(--font-heading);
     opacity: 0;
     transition: opacity 0.3s ease;
     pointer-events: none;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+    text-shadow: 0 1px 3px rgba(0,0,0,0.9);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -269,23 +288,27 @@ body {
 }
 
 /* --------------------------------------------------------------------------
-   PhotoSwipe v5 Custom Caption Styling
+   PhotoSwipe v5 Custom Caption & Theme Adjustments
    -------------------------------------------------------------------------- */
 .pswp__custom-caption {
-    background: rgba(0, 0, 0, 0.7);
-    color: #fff;
+    background: rgba(10, 10, 10, 0.8);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: #f0f0f0;
     font-size: 15px;
     font-family: var(--font-heading);
-    padding: 8px 18px;
-    border-radius: 4px;
+    padding: 10px 22px;
+    border-radius: 3px;
     position: absolute;
-    bottom: 20px;
+    bottom: 24px;
     left: 50%;
     transform: translateX(-50%);
-    max-width: 80%;
+    max-width: 85%;
     text-align: center;
     pointer-events: none;
     letter-spacing: 0.5px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
 }
 
 /* --------------------------------------------------------------------------
@@ -305,8 +328,19 @@ body {
         width: 100%;
         height: auto;
         padding: 20px 24px;
+        background-color: rgba(18, 18, 18, 0.95);
         border-right: none;
-        border-bottom: 1px solid var(--border-color);
+        border-bottom: 1px solid var(--sidebar-border);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .page-home #site-header {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        background-color: rgba(14, 14, 14, 0.7);
     }
 
     .branding {
@@ -328,7 +362,7 @@ body {
         display: none;
         margin-top: 20px;
         padding-top: 15px;
-        border-top: 1px solid var(--border-color);
+        border-top: 1px solid var(--sidebar-border);
     }
 
     #site-nav.open {
@@ -344,7 +378,7 @@ body {
     }
 
     .gallery-main {
-        padding: 25px 15px 40px 15px;
+        padding: 25px 15px 50px 15px;
     }
 
     .gallery-title {
