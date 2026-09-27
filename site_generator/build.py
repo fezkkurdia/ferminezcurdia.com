@@ -417,8 +417,9 @@ class SiteBuilder:
 
             # Photos HTML for PhotoSwipe v5 Masonry Grid
             photos_html_list = []
-            for p in g["photos"]:
+            for p_idx, p in enumerate(g["photos"]):
                 title_attr = p["title"].replace('"', '&quot;')
+                loading_attr = 'loading="eager" fetchpriority="high"' if p_idx < 8 else 'loading="lazy"'
                 item_html = f"""
                 <div class="gallery-item" style="--aspect-ratio: {p['aspect_ratio']};">
                     <a href="{p['full_webp']}"
@@ -431,7 +432,7 @@ class SiteBuilder:
                             <source srcset="{p['thumb_webp']}" type="image/webp">
                             <img src="{p['thumb_jpg']}"
                                  alt="{title_attr}"
-                                 loading="lazy"
+                                 {loading_attr}
                                  width="{p['thumb_width']}"
                                  height="{p['thumb_height']}" />
                         </picture>
@@ -521,7 +522,8 @@ class SiteBuilder:
             pswpModule: () => import('/assets/vendor/photoswipe/photoswipe.esm.min.js'),
             padding: {{ top: 20, bottom: 40, left: 20, right: 20 }},
             bgOpacity: 0.94,
-            wheelToZoom: true
+            wheelToZoom: true,
+            preload: [1, 2]
         }});
 
         // Custom caption plugin for PhotoSwipe v5

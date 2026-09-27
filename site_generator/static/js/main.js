@@ -1,4 +1,4 @@
-// Mobile navigation menu toggle, Masonry Layout & Back-to-Top Button
+// Mobile navigation menu toggle, Masonry Layout, Back-to-Top Button & Speculative Preloader
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Mobile Menu Toggle
     const menuToggle = document.getElementById('menu-toggle');
@@ -29,7 +29,47 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 3. Masonry Gallery Layout Engine
     initMasonry();
+
+    // 4. Speculative Preloader on Thumbnail Hover/Touch
+    initSpeculativePreloader();
 });
+
+function initSpeculativePreloader() {
+    const gallery = document.getElementById('photo-gallery');
+    if (!gallery) return;
+
+    const preloadedUrls = new Set();
+    function preloadUrl(url) {
+        if (!url || preloadedUrls.has(url)) return;
+        preloadedUrls.add(url);
+        const img = new Image();
+        img.src = url;
+    }
+
+    let hoverTimer = null;
+
+    // Hover intent (60ms): triggers when user pauses pointer over a photo thumbnail
+    gallery.addEventListener('pointerover', (e) => {
+        const link = e.target.closest('a[data-pswp-width]');
+        if (!link || !link.href) return;
+        clearTimeout(hoverTimer);
+        hoverTimer = setTimeout(() => {
+            preloadUrl(link.href);
+        }, 60);
+    }, { passive: true });
+
+    gallery.addEventListener('pointerout', () => {
+        clearTimeout(hoverTimer);
+    }, { passive: true });
+
+    // Touchstart: instantly preload on touch before tap-click completes
+    gallery.addEventListener('touchstart', (e) => {
+        const link = e.target.closest('a[data-pswp-width]');
+        if (link && link.href) {
+            preloadUrl(link.href);
+        }
+    }, { passive: true });
+}
 
 function initMasonry() {
     const gallery = document.getElementById('photo-gallery');
