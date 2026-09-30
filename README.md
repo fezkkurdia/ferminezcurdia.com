@@ -38,7 +38,7 @@ El fotógrafo no necesita tocar código ni bases de datos. Todo el contenido se 
 * **Procesado incremental inteligente:** Utiliza `.cache/` y hashes SHA-256 para no volver a procesar imágenes ya existentes. Las compilaciones posteriores tardan menos de 1 segundo.
 * **Formatos de imagen generados:**
   * **Miniaturas (Thumbs):** Altura 360px en WebP (~15-30 KB) y JPG de respaldo.
-  * **Visualización (Display):** Máximo 2048px en WebP (~150-250 KB) con máxima fidelidad fotográfica y JPG de respaldo.
+  * **Visualización (Display):** Máximo 2560px (Retina/4K) en WebP (~200-400 KB) con máxima fidelidad fotográfica y JPG de respaldo.
 * **Frontend:**
   * Maquetación limpia basada en flexbox con aspect-ratio para cuadrícula en mosaico justificado.
   * Cero saltos visuales de maquetación (CLS = 0) gracias al precálculo de dimensiones.
@@ -68,23 +68,3 @@ Para compilar o probar la web en tu equipo:
    python -m http.server 8000 --directory dist
    ```
    Abre [http://localhost:8000](http://localhost:8000) en tu navegador.
-
----
-
-## 🌐 Configuración de GitHub Pages y Cloudflare
-
-1. **Crear el repositorio en GitHub:**
-   Crea un repositorio (ej. `ferminezcurdia.com` o `portfolio`) y sube el proyecto:
-   ```bash
-   git remote add origin https://github.com/<tu-usuario>/<tu-repo>.git
-   git push -u origin main
-   ```
-
-2. **Activar GitHub Pages:**
-   * En el repositorio de GitHub, ve a **Settings** > **Pages**.
-   * En **Build and deployment** > **Source**, selecciona **GitHub Actions**.
-
-3. **Cloudflare (DNS y Caché):**
-   * Apunta el registro CNAME de tu dominio `ferminezcurdia.com` a `<tu-usuario>.github.io` con la **nube naranja activada** (Proxied).
-   * En Cloudflare **SSL/TLS**, selecciona modo **Full** o **Full (strict)**.
-   * La CDN de Cloudflare almacenará en caché perimetral todas las imágenes (`/assets/images/*`), logrando cargas instantáneas en todo el mundo sin sobrecargar GitHub Pages.
