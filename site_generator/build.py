@@ -243,9 +243,10 @@ class SiteBuilder:
         if (STATIC_SRC_DIR / "favicon.svg").exists():
             shutil.copy(STATIC_SRC_DIR / "favicon.svg", DIST_DIR / "favicon.svg")
 
-        # 2. Write CNAME
+        # 2. Write CNAME and .nojekyll for GitHub Pages
         with open(DIST_DIR / "CNAME", "w", encoding="utf-8") as f:
             f.write("ferminezcurdia.com\n")
+        (DIST_DIR / ".nojekyll").touch()
 
         # 3. Discover content
         galleries = self.discover_galleries()
