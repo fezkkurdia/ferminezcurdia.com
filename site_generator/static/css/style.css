@@ -351,7 +351,7 @@ body {
 /* --------------------------------------------------------------------------
    Responsive Mobile Adjustments
    -------------------------------------------------------------------------- */
-@media (max-width: 900px) {
+@media (max-width: 900px), (orientation: landscape) and (max-height: 550px) {
     :root {
         --gallery-row-height: 140px;
     }
@@ -439,6 +439,35 @@ body {
     .gallery-title {
         font-size: 22px;
         margin-bottom: 18px;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   Mobile Landscape Adjustments (Fit home slideshow to screen height)
+   -------------------------------------------------------------------------- */
+@media (orientation: landscape) and (max-height: 600px) {
+    .page-home .slide-item {
+        background-size: contain;
+        background-position: center center;
+    }
+
+    .page-home #site-header {
+        padding: 10px 20px;
+    }
+
+    .page-home .branding .site-title h1 {
+        font-size: 18px;
+        line-height: 1.1;
+    }
+
+    .page-home #site-nav {
+        max-height: calc(100vh - 60px);
+        margin-top: 10px;
+        padding-top: 10px;
+    }
+
+    .page-home #site-nav li {
+        margin-bottom: 8px;
     }
 }
 
