@@ -236,6 +236,10 @@ body {
     opacity: 1;
 }
 
+#home-mobile-footer {
+    display: none;
+}
+
 /* --------------------------------------------------------------------------
    Photo Gallery - Masonry Grid Layout
    -------------------------------------------------------------------------- */
@@ -430,6 +434,50 @@ body {
         overflow-y: auto;
     }
 
+    /* Mobile Portrait Bottom Bar for Social Links */
+    .page-home #home-mobile-footer {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        width: 100%;
+        height: 52px;
+        flex-shrink: 0;
+        background-color: #0c0c0c;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.7);
+        z-index: 100;
+    }
+
+    .page-home .home-social-nav {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 36px;
+    }
+
+    .page-home .home-social-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #999999;
+        transition: color 0.2s ease, transform 0.2s ease;
+        padding: 8px;
+        text-decoration: none;
+    }
+
+    .page-home .home-social-link:hover,
+    .page-home .home-social-link:active {
+        color: #ffffff;
+        transform: scale(1.15);
+    }
+
+    .page-home .home-social-link svg {
+        width: 22px;
+        height: 22px;
+        display: block;
+    }
+
     .page-gallery #site-header {
         border-right: none;
         border-bottom: 1px solid rgba(255, 255, 255, 0.12);
@@ -599,6 +647,10 @@ body {
         background-size: contain;
         background-position: center center;
         background-repeat: no-repeat;
+    }
+
+    .page-home #home-mobile-footer {
+        display: none !important;
     }
 }
 
