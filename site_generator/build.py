@@ -343,13 +343,13 @@ class SiteBuilder:
         return """
         <footer id="home-mobile-footer" aria-label="Redes sociales">
             <div class="home-social-nav">
-                <a href="https://www.flickr.com/photos/ezcurdia/albums" target="_blank" rel="noopener" class="home-social-link" title="Flickr" aria-label="Flickr">
+                <a href="https://www.flickr.com/photos/ezcurdia/albums/" target="_blank" rel="noopener" class="home-social-link" title="Flickr" aria-label="Flickr">
                     <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true">
                         <circle cx="7" cy="12" r="4.5"/>
                         <circle cx="17" cy="12" r="4.5"/>
                     </svg>
                 </a>
-                <a href="https://www.instagram.com/" target="_blank" rel="noopener" class="home-social-link" title="Instagram" aria-label="Instagram">
+                <a href="https://www.instagram.com/ferminezkurdia/?hl=es" target="_blank" rel="noopener" class="home-social-link" title="Instagram" aria-label="Instagram">
                     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <rect x="2.5" y="2.5" width="19" height="19" rx="5" ry="5"/>
                         <circle cx="12" cy="12" r="4"/>
@@ -361,7 +361,7 @@ class SiteBuilder:
                         <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
                     </svg>
                 </a>
-                <a href="https://www.lumenira.com/" target="_blank" rel="noopener" class="home-social-link" title="Lumenira" aria-label="Lumenira">
+                <a href="https://lumenira.com/user/Fermin" target="_blank" rel="noopener" class="home-social-link" title="Lumenira" aria-label="Lumenira">
                     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <circle cx="12" cy="12" r="9.5"/>
                         <path d="M14.3 2.5 L8.5 12.5"/>
@@ -377,6 +377,14 @@ class SiteBuilder:
         """
 
     def render_pages(self, home_slides: list, galleries: list):
+        # Asset cache busting hashes
+        css_file = STATIC_SRC_DIR / "css" / "style.css"
+        css_v = compute_file_hash(css_file)[:8] if css_file.exists() else "1"
+        js_file = STATIC_SRC_DIR / "js" / "main.js"
+        js_v = compute_file_hash(js_file)[:8] if js_file.exists() else "1"
+        slideshow_file = STATIC_SRC_DIR / "js" / "slideshow.js"
+        slideshow_v = compute_file_hash(slideshow_file)[:8] if slideshow_file.exists() else "1"
+
         # 1. Render Home (index.html)
         home_sidebar = self.get_sidebar_html("home", galleries)
         home_mobile_footer = self.get_home_mobile_footer_html()
@@ -396,7 +404,7 @@ class SiteBuilder:
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Fermín Ezcurdia | Fotografía</title>
     <meta name="description" content="Portfolio y galerías de fotografía de Fermín Ezcurdia. Retratos, naturaleza, rituales, tradiciones, religiones y ciudades del mundo.">
     <link rel="canonical" href="https://ferminezcurdia.com/">
@@ -413,7 +421,7 @@ class SiteBuilder:
     <meta name="twitter:title" content="Fermín Ezcurdia | Fotografía">
     <meta name="twitter:description" content="Portfolio y galerías de fotografía de Fermín Ezcurdia.">
     <meta name="twitter:image" content="https://ferminezcurdia.com{first_slide_jpg}">
-    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/style.css?v={css_v}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Droid+Serif:ital,wght@0,400;0,700;1,400&family=Oswald:wght@300;400;500&display=swap" rel="stylesheet">
@@ -432,8 +440,8 @@ class SiteBuilder:
     <script>
         const HOME_SLIDES = {slides_json};
     </script>
-    <script src="/assets/js/slideshow.js"></script>
-    <script src="/assets/js/main.js"></script>
+    <script src="/assets/js/slideshow.js?v={slideshow_v}"></script>
+    <script src="/assets/js/main.js?v={js_v}"></script>
 </body>
 </html>
 """
@@ -518,7 +526,7 @@ class SiteBuilder:
     <meta name="twitter:title" content="{g['label']} | Fermín Ezcurdia">
     <meta name="twitter:description" content="Galería fotográfica {g['label']} de Fermín Ezcurdia.">
     <meta name="twitter:image" content="https://ferminezcurdia.com{cover_photo}">
-    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/style.css?v={css_v}">
     <link rel="stylesheet" href="/assets/vendor/photoswipe/photoswipe.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -606,7 +614,7 @@ class SiteBuilder:
 
         lightbox.init();
     </script>
-    <script src="/assets/js/main.js"></script>
+    <script src="/assets/js/main.js?v={js_v}"></script>
 </body>
 </html>
 """
