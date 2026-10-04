@@ -112,6 +112,13 @@ body {
 }
 
 /* Navigation List */
+#site-nav {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    justify-content: space-between;
+}
+
 #site-nav ul {
     list-style: none;
 }
@@ -144,6 +151,66 @@ body {
     font-weight: 500;
     border-bottom: 1px solid rgba(255, 255, 255, 0.8);
     padding-bottom: 3px;
+}
+
+/* --------------------------------------------------------------------------
+   Classic Colored Social Brand Icons
+   -------------------------------------------------------------------------- */
+.social-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    padding: 8px;
+    border-radius: 6px;
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+}
+
+.social-link:hover,
+.social-link:focus-visible {
+    transform: scale(1.18);
+    opacity: 0.95;
+}
+
+.social-link:active {
+    transform: scale(1.05);
+}
+
+.social-link svg {
+    display: block;
+    width: 22px;
+    height: 22px;
+}
+
+.social-link.instagram .instagram-icon-box {
+    width: 22px;
+    height: 22px;
+    border-radius: 5.5px;
+    background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+.social-link.instagram svg {
+    width: 15px;
+    height: 15px;
+}
+
+.social-link.lumenira .lumenira-icon-img {
+    display: block;
+    width: 26px;
+    height: auto;
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5));
+}
+
+.menu-social-nav {
+    margin-top: auto;
+    padding-top: 30px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
 }
 
 /* Footer Credit */
@@ -460,7 +527,7 @@ body {
         padding-bottom: calc(58px + env(safe-area-inset-bottom, 0px));
     }
 
-    .page-home .home-social-nav {
+    .home-social-nav {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -468,28 +535,6 @@ body {
         width: 100%;
         max-width: 360px;
         margin: 0 auto;
-    }
-
-    .page-home .home-social-link {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #cccccc;
-        transition: color 0.2s ease, transform 0.2s ease;
-        padding: 10px;
-        text-decoration: none;
-    }
-
-    .page-home .home-social-link:hover,
-    .page-home .home-social-link:active {
-        color: #ffffff;
-        transform: scale(1.15);
-    }
-
-    .page-home .home-social-link svg {
-        width: 22px;
-        height: 22px;
-        display: block;
     }
 
     .page-gallery #site-header {
@@ -552,6 +597,17 @@ body {
         display: inline-block;
         padding: 4px 0;
         text-shadow: 0 1px 4px rgba(0, 0, 0, 0.85);
+    }
+
+    #site-nav.open .menu-social-nav {
+        margin-top: 22px;
+        padding-top: 18px;
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 28px;
+        width: 100%;
     }
 
     #site-footer {
@@ -635,7 +691,9 @@ body {
 
     /* Persistent Navigation Menu */
     .page-home #site-nav {
-        display: block !important;
+        display: flex !important;
+        flex-direction: column !important;
+        flex: 1 !important;
         position: static !important;
         margin-top: 0;
         padding-top: 0;
@@ -663,6 +721,14 @@ body {
     .page-home #site-nav a {
         font-size: 11px;
         letter-spacing: 1.5px;
+    }
+
+    .page-home #site-nav .menu-social-nav {
+        margin-top: auto;
+        padding-top: 14px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
     }
 
     /* Main Slideshow Area: Placed cleanly to the right of the sidebar */

@@ -305,6 +305,38 @@ class SiteBuilder:
         self.render_pages(processed_slides, processed_galleries)
         print("=== Build Complete! Site generated in dist/ ===")
 
+    def get_social_links_html(self, container_class: str = "social-nav") -> str:
+        return f"""
+            <div class="{container_class}" aria-label="Redes sociales">
+                <a href="https://www.flickr.com/photos/ezcurdia/albums/" target="_blank" rel="noopener" class="social-link flickr" title="Flickr" aria-label="Flickr">
+                    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                        <circle cx="7" cy="12" r="4.5" fill="#0063dc"/>
+                        <circle cx="17" cy="12" r="4.5" fill="#ff0084"/>
+                    </svg>
+                </a>
+                <a href="https://www.instagram.com/ferminezkurdia/?hl=es" target="_blank" rel="noopener" class="social-link instagram" title="Instagram" aria-label="Instagram">
+                    <div class="instagram-icon-box">
+                        <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+                            <rect x="2" y="2" width="20" height="20" rx="5" fill="none" stroke="#ffffff" stroke-width="2.2"/>
+                            <circle cx="12" cy="12" r="4.2" fill="none" stroke="#ffffff" stroke-width="2.2"/>
+                            <circle cx="17" cy="7" r="1.2" fill="#ffffff"/>
+                        </svg>
+                    </div>
+                </a>
+                <a href="https://www.facebook.com/" target="_blank" rel="noopener" class="social-link facebook" title="Facebook" aria-label="Facebook">
+                    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                        <circle cx="12" cy="12" r="11" fill="#1877F2"/>
+                        <path d="M14.8 12.2h-2.1v6.8h-2.8v-6.8H8.5V9.8h1.4V8.1c0-1.9 1.1-3.1 3-3.1.9 0 1.9.1 1.9.1v2.1h-1.1c-1 0-1.2.6-1.2 1.2v1.4h2.5l-.2 2.4z" fill="#ffffff"/>
+                    </svg>
+                </a>
+                <a href="https://lumenira.com/user/Fermin" target="_blank" rel="noopener" class="social-link lumenira" title="Lumenira" aria-label="Lumenira">
+                    <picture>
+                        <source srcset="/assets/images/lumenira.webp" type="image/webp">
+                        <img src="/assets/images/lumenira.png" alt="Lumenira" width="26" height="11" class="lumenira-icon-img">
+                    </picture>
+                </a>
+            </div>"""
+
     def get_sidebar_html(self, current_slug: str, galleries: list) -> str:
         menu_items = []
 
@@ -315,9 +347,8 @@ class SiteBuilder:
             active = ' class="active"' if current_slug == g["slug"] else ''
             menu_items.append(f'<li{active}><a href="/{g["slug"]}/">{g["label"]}</a></li>')
 
-        menu_items.append('<li><a href="https://www.flickr.com/photos/ezcurdia/albums" target="_blank" rel="noopener">FLICKR</a></li>')
-
-        menu_html = "\n        ".join(menu_items)
+        menu_html = "\n                    ".join(menu_items)
+        social_html = self.get_social_links_html("menu-social-nav")
 
         return f"""
         <header id="site-header">
@@ -335,44 +366,16 @@ class SiteBuilder:
                 <ul>
                     {menu_html}
                 </ul>
+                {social_html}
             </nav>
         </header>
         """
 
     def get_home_mobile_footer_html(self) -> str:
-        return """
+        social_html = self.get_social_links_html("home-social-nav")
+        return f"""
         <footer id="home-mobile-footer" aria-label="Redes sociales">
-            <div class="home-social-nav">
-                <a href="https://www.flickr.com/photos/ezcurdia/albums/" target="_blank" rel="noopener" class="home-social-link" title="Flickr" aria-label="Flickr">
-                    <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true">
-                        <circle cx="7" cy="12" r="4.5"/>
-                        <circle cx="17" cy="12" r="4.5"/>
-                    </svg>
-                </a>
-                <a href="https://www.instagram.com/ferminezkurdia/?hl=es" target="_blank" rel="noopener" class="home-social-link" title="Instagram" aria-label="Instagram">
-                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <rect x="2.5" y="2.5" width="19" height="19" rx="5" ry="5"/>
-                        <circle cx="12" cy="12" r="4"/>
-                        <circle cx="17.2" cy="6.8" r="0.9" fill="currentColor"/>
-                    </svg>
-                </a>
-                <a href="https://www.facebook.com/" target="_blank" rel="noopener" class="home-social-link" title="Facebook" aria-label="Facebook">
-                    <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true">
-                        <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
-                    </svg>
-                </a>
-                <a href="https://lumenira.com/user/Fermin" target="_blank" rel="noopener" class="home-social-link" title="Lumenira" aria-label="Lumenira">
-                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <circle cx="12" cy="12" r="9.5"/>
-                        <path d="M14.3 2.5 L8.5 12.5"/>
-                        <path d="M21.5 9.7 L11.5 15.5"/>
-                        <path d="M19.2 19.2 L9.2 13.5"/>
-                        <path d="M9.7 21.5 L15.5 11.5"/>
-                        <path d="M2.5 14.3 L12.5 8.5"/>
-                        <path d="M4.8 4.8 L14.8 10.5"/>
-                    </svg>
-                </a>
-            </div>
+            {social_html}
         </footer>
         """
 
