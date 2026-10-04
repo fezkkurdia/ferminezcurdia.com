@@ -431,13 +431,41 @@ class SiteBuilder:
                 var h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
                 document.documentElement.style.setProperty('--app-height', Math.round(h) + 'px');
             }}
+            function detectBottomBar() {{
+                var isBrave = false;
+                if (window.navigator) {{
+                    if (window.navigator.brave) {{
+                        isBrave = true;
+                    }} else if (window.navigator.userAgentData && window.navigator.userAgentData.brands) {{
+                        isBrave = window.navigator.userAgentData.brands.some(function(b) {{
+                            return b.brand && b.brand.toLowerCase().indexOf('brave') !== -1;
+                        }});
+                    }}
+                }}
+                if (isBrave) {{
+                    document.documentElement.classList.add('has-bottom-bar');
+                    document.documentElement.style.setProperty('--bottom-bar-offset', '58px');
+                }}
+            }}
             updateAppHeight();
+            detectBottomBar();
+            if (window.navigator && window.navigator.brave && typeof window.navigator.brave.isBrave === 'function') {{
+                window.navigator.brave.isBrave().then(function(b) {{
+                    if (b) {{
+                        document.documentElement.classList.add('has-bottom-bar');
+                        document.documentElement.style.setProperty('--bottom-bar-offset', '58px');
+                    }}
+                }});
+            }}
             window.addEventListener('resize', updateAppHeight);
             window.addEventListener('orientationchange', updateAppHeight);
             if (window.visualViewport) {{
                 window.visualViewport.addEventListener('resize', updateAppHeight);
             }}
-            document.addEventListener('DOMContentLoaded', updateAppHeight);
+            document.addEventListener('DOMContentLoaded', function() {{
+                updateAppHeight();
+                detectBottomBar();
+            }});
         }})();
     </script>
     <script type="application/ld+json">

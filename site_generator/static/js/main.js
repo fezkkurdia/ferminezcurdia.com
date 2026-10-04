@@ -11,10 +11,36 @@ function initAppHeight() {
         window.visualViewport.addEventListener('resize', update);
     }
 }
+
+function detectBottomBar() {
+    let isBrave = false;
+    if (window.navigator) {
+        if (window.navigator.brave) {
+            isBrave = true;
+        } else if (window.navigator.userAgentData && window.navigator.userAgentData.brands) {
+            isBrave = window.navigator.userAgentData.brands.some(b => b.brand && b.brand.toLowerCase().includes('brave'));
+        }
+    }
+    if (isBrave) {
+        document.documentElement.classList.add('has-bottom-bar');
+        document.documentElement.style.setProperty('--bottom-bar-offset', '58px');
+    }
+    if (window.navigator && window.navigator.brave && typeof window.navigator.brave.isBrave === 'function') {
+        window.navigator.brave.isBrave().then(b => {
+            if (b) {
+                document.documentElement.classList.add('has-bottom-bar');
+                document.documentElement.style.setProperty('--bottom-bar-offset', '58px');
+            }
+        });
+    }
+}
+
 initAppHeight();
+detectBottomBar();
 
 document.addEventListener('DOMContentLoaded', () => {
     initAppHeight();
+    detectBottomBar();
 
     // 1. Mobile Menu Toggle
     const menuToggle = document.getElementById('menu-toggle');
