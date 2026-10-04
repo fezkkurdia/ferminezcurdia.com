@@ -47,9 +47,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const siteNav = document.getElementById('site-nav');
 
     if (menuToggle && siteNav) {
-        menuToggle.addEventListener('click', () => {
+        menuToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
             const isOpen = siteNav.classList.toggle('open');
             menuToggle.setAttribute('aria-expanded', isOpen);
+        });
+
+        document.addEventListener('click', (e) => {
+            if (siteNav.classList.contains('open') && !siteNav.contains(e.target) && !menuToggle.contains(e.target)) {
+                siteNav.classList.remove('open');
+                menuToggle.setAttribute('aria-expanded', 'false');
+            }
         });
     }
 
