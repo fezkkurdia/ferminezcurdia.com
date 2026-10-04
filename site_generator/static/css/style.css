@@ -79,18 +79,41 @@ body {
 .branding .site-title {
     text-decoration: none;
     color: var(--text-title);
-    display: block;
+    display: inline-block;
 }
 
-.branding .site-title h1 {
-    font-family: var(--font-heading);
-    font-size: 26px;
-    font-weight: 400;
-    letter-spacing: 0.5px;
-    line-height: 1.2;
-    color: #ffffff;
+.branding .logo-heading {
+    margin: 0;
+    padding: 0;
+    font-size: 0;
+    line-height: 0;
+}
+
+.branding .site-logo {
+    display: block;
+    width: 180px;
+    max-width: 100%;
+    height: auto;
     margin-bottom: 35px;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.7));
+}
+
+.branding .site-title:hover .site-logo {
+    opacity: 0.92;
+    transform: scale(1.02);
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
 }
 
 /* Mobile menu toggle */
@@ -422,7 +445,7 @@ body {
 /* --------------------------------------------------------------------------
    Responsive Mobile Adjustments
    -------------------------------------------------------------------------- */
-@media (max-width: 900px), (orientation: landscape) and (max-height: 550px) {
+@media (max-width: 900px), (orientation: landscape) and (max-height: 600px) {
     :root {
         --gallery-row-height: 140px;
     }
@@ -538,6 +561,9 @@ body {
     }
 
     .page-gallery #site-header {
+        background-color: rgba(12, 12, 12, 0.75);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
         border-right: none;
         border-bottom: 1px solid rgba(255, 255, 255, 0.12);
         box-shadow: 0 4px 18px rgba(0, 0, 0, 0.65);
@@ -547,11 +573,19 @@ body {
         display: flex;
         align-items: center;
         justify-content: space-between;
+        width: 100%;
     }
 
-    .branding .site-title h1 {
+    .branding .site-title {
+        display: flex;
+        align-items: center;
+    }
+
+    .branding .site-logo {
+        width: auto;
+        height: 38px;
+        max-height: 38px;
         margin-bottom: 0;
-        font-size: 22px;
     }
 
     #menu-toggle {
@@ -672,15 +706,15 @@ body {
         overflow-x: hidden;
     }
 
-    /* Branding & Two-line Name */
+    /* Branding Logo */
     .page-home .branding {
         display: block;
         margin-bottom: 18px;
     }
 
-    .page-home .branding .site-title h1 {
-        font-size: 19px;
-        line-height: 1.15;
+    .page-home .site-logo {
+        width: 140px;
+        height: auto;
         margin-bottom: 0;
     }
 
@@ -769,6 +803,118 @@ body {
 
     .page-home #home-mobile-footer {
         display: none !important;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   Gallery Pages - Mobile Landscape Orientation
+   Slim header (50% height), scaled logo & hamburger, 75% frosted glass blur
+   -------------------------------------------------------------------------- */
+@media (orientation: landscape) and (max-height: 600px) {
+    .page-gallery #layout-container {
+        flex-direction: column;
+    }
+
+    .page-gallery #site-header {
+        position: sticky;
+        top: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height: auto;
+        bottom: auto;
+        padding: 5px 16px;
+        background-color: rgba(12, 12, 12, 0.75);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        box-sizing: border-box;
+    }
+
+    .page-gallery .branding {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        margin-bottom: 0;
+    }
+
+    .page-gallery .site-logo {
+        width: auto;
+        height: 24px;
+        max-height: 24px;
+        margin-bottom: 0;
+    }
+
+    .page-gallery #menu-toggle {
+        display: block !important;
+        padding: 3px 5px;
+    }
+
+    .page-gallery #menu-toggle span {
+        width: 18px;
+        height: 2px;
+        margin: 3px 0;
+    }
+
+    .page-gallery #site-nav {
+        display: none;
+    }
+
+    .page-gallery #site-nav.open {
+        display: block;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background-color: rgba(12, 12, 12, 0.75);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+        padding: 10px 18px 14px 18px;
+        max-height: calc(100vh - 40px);
+        max-height: calc(100dvh - 40px);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        z-index: 1000;
+    }
+
+    .page-gallery #site-nav.open li {
+        margin-bottom: 8px;
+    }
+
+    .page-gallery #site-nav.open a {
+        font-size: 11px;
+        letter-spacing: 1.5px;
+        padding: 2px 0;
+    }
+
+    .page-gallery #site-nav.open .menu-social-nav {
+        margin-top: 10px;
+        padding-top: 10px;
+        gap: 16px;
+    }
+
+    .page-gallery #site-nav.open .menu-social-nav img {
+        width: 18px;
+        height: 18px;
+    }
+
+    .page-gallery #main-content {
+        margin-left: 0;
+    }
+
+    .page-gallery .gallery-main {
+        padding: 18px 14px 35px 14px;
+    }
+
+    .page-gallery .gallery-title {
+        font-size: 18px;
+        margin-bottom: 12px;
     }
 }
 

@@ -353,8 +353,14 @@ class SiteBuilder:
         return f"""
         <header id="site-header">
             <div class="branding">
-                <a href="/" class="site-title">
-                    <h1>Fermín<br>Ezcurdia</h1>
+                <a href="/" class="site-title" aria-label="Fermín Ezkurdia">
+                    <h1 class="logo-heading">
+                        <span class="sr-only">Fermín Ezkurdia</span>
+                        <picture>
+                            <source srcset="/assets/images/logo.webp" type="image/webp">
+                            <img src="/assets/images/logo.png" alt="Fermín Ezkurdia" class="site-logo" width="180" height="54">
+                        </picture>
+                    </h1>
                 </a>
                 <button id="menu-toggle" aria-label="Abrir menú" aria-expanded="false">
                     <span></span>
