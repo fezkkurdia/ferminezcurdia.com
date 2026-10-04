@@ -443,31 +443,122 @@ body {
 }
 
 /* --------------------------------------------------------------------------
-   Mobile Landscape Adjustments (Fit home slideshow to screen height)
+   Home Page - Mobile Landscape Orientation
+   Left sidebar navigation and slideshow fitting dynamic viewport height (no overlay)
    -------------------------------------------------------------------------- */
 @media (orientation: landscape) and (max-height: 600px) {
-    .page-home .slide-item {
-        background-size: contain;
-        background-position: center center;
+    .page-home {
+        --sidebar-width: clamp(190px, 25vw, 225px);
     }
 
+    .page-home #layout-container {
+        flex-direction: row;
+        min-height: 100vh;
+        min-height: 100svh;
+        min-height: 100dvh;
+    }
+
+    /* Fixed Left Sidebar on Home (Desktop Photocrati style) */
     .page-home #site-header {
-        padding: 10px 20px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: auto;
+        width: var(--sidebar-width);
+        height: 100vh;
+        height: 100svh;
+        height: 100dvh;
+        padding: 20px 16px 20px 22px;
+        background-color: rgba(11, 11, 11, 0.95);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border-right: 1px solid rgba(255, 255, 255, 0.12);
+        border-bottom: none;
+        box-shadow: 4px 0 25px rgba(0, 0, 0, 0.7);
+        z-index: 100;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    /* Branding & Two-line Name */
+    .page-home .branding {
+        display: block;
+        margin-bottom: 18px;
     }
 
     .page-home .branding .site-title h1 {
-        font-size: 18px;
-        line-height: 1.1;
+        font-size: 19px;
+        line-height: 1.15;
+        margin-bottom: 0;
     }
 
+    /* Hide the hamburger button (menu is always visible in sidebar) */
+    .page-home #menu-toggle {
+        display: none !important;
+    }
+
+    /* Persistent Navigation Menu */
     .page-home #site-nav {
-        max-height: calc(100vh - 60px);
-        margin-top: 10px;
-        padding-top: 10px;
+        display: block !important;
+        margin-top: 0;
+        padding-top: 0;
+        border-top: none;
+        max-height: none;
+        overflow: visible;
+    }
+
+    .page-home #site-nav ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
     }
 
     .page-home #site-nav li {
         margin-bottom: 8px;
+    }
+
+    .page-home #site-nav a {
+        font-size: 11px;
+        letter-spacing: 1.5px;
+    }
+
+    /* Main Slideshow Area: Placed cleanly to the right of the sidebar */
+    .page-home .home-main {
+        position: fixed;
+        top: 0;
+        left: var(--sidebar-width);
+        right: 0;
+        bottom: 0;
+        width: auto;
+        height: 100vh;
+        height: 100svh;
+        height: 100dvh; /* Dynamic viewport height: respects mobile browser URL / navigation bars */
+        overflow: hidden;
+        z-index: 1;
+        background-color: #0c0c0c;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .page-home #slideshow-container {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        background-color: #0c0c0c;
+    }
+
+    /* Scaled to fit viewport height and width with zero cropping */
+    .page-home .slide-item {
+        position: absolute;
+        inset: 0;
+        background-size: contain;
+        background-position: center center;
+        background-repeat: no-repeat;
     }
 }
 
