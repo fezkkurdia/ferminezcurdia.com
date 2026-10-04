@@ -373,9 +373,9 @@ body {
         height: auto;
         bottom: auto;
         padding: 16px 24px;
-        background-color: rgba(12, 12, 12, 0.52);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
+        background-color: rgba(12, 12, 12, 0.74);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
         border-right: none;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
@@ -410,9 +410,9 @@ body {
         width: 100%;
         flex: 0 0 auto;
         z-index: 1000;
-        background-color: rgba(12, 12, 12, 0.52);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
+        background-color: rgba(12, 12, 12, 0.74);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
         padding: 16px 24px;
@@ -523,9 +523,9 @@ body {
         top: 100%;
         left: 0;
         right: 0;
-        background-color: rgba(12, 12, 12, 0.52);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
+        background-color: rgba(12, 12, 12, 0.74);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
         border-bottom: 1px solid rgba(255, 255, 255, 0.12);
         box-shadow: 0 12px 32px rgba(0, 0, 0, 0.65);
         padding: 22px 24px 26px 24px;
