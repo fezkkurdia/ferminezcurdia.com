@@ -381,18 +381,23 @@ body {
         z-index: 1000;
     }
 
-    .page-home #layout-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        width: 100%;
+    .page-home {
         height: 100%;
-        height: 100svh;
+        height: var(--app-height, 100dvh);
+        overflow: hidden;
+    }
+
+    .page-home #layout-container {
         display: flex;
         flex-direction: column;
+        width: 100%;
+        height: 100%;
+        height: 100dvh;
+        height: var(--app-height, 100dvh);
+        max-height: var(--app-height, 100dvh);
+        position: relative;
         overflow: hidden;
+        box-sizing: border-box;
     }
 
     .page-home #site-header {
@@ -410,6 +415,7 @@ body {
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
         padding: 16px 24px;
+        box-sizing: border-box;
     }
 
     .page-home .home-main {
@@ -422,6 +428,7 @@ body {
         width: 100%;
         overflow: hidden;
         z-index: 1;
+        box-sizing: border-box;
     }
 
     .page-home #slideshow-container {
@@ -443,7 +450,7 @@ body {
         box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8);
         padding: 20px 24px;
         margin-top: 0;
-        max-height: calc(100svh - 80px);
+        max-height: calc(var(--app-height, 100dvh) - 80px);
         overflow-y: auto;
     }
 
@@ -454,15 +461,15 @@ body {
         justify-content: center;
         position: relative;
         width: 100%;
-        height: 52px;
-        min-height: 52px;
-        flex: 0 0 auto;
+        height: calc(52px + env(safe-area-inset-bottom, 0px));
+        min-height: calc(52px + env(safe-area-inset-bottom, 0px));
+        flex: 0 0 calc(52px + env(safe-area-inset-bottom, 0px));
         background-color: #0c0c0c;
         border-top: 1px solid rgba(255, 255, 255, 0.12);
         box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.7);
         z-index: 100;
         padding-bottom: env(safe-area-inset-bottom, 0px);
-        box-sizing: content-box;
+        box-sizing: border-box;
     }
 
     .page-home .home-social-nav {

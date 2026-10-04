@@ -404,7 +404,7 @@ class SiteBuilder:
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
     <title>Fermín Ezcurdia | Fotografía</title>
     <meta name="description" content="Portfolio y galerías de fotografía de Fermín Ezcurdia. Retratos, naturaleza, rituales, tradiciones, religiones y ciudades del mundo.">
     <link rel="canonical" href="https://ferminezcurdia.com/">
@@ -425,6 +425,21 @@ class SiteBuilder:
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Droid+Serif:ital,wght@0,400;0,700;1,400&family=Oswald:wght@300;400;500&display=swap" rel="stylesheet">
+    <script>
+        (function() {{
+            function updateAppHeight() {{
+                var h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+                document.documentElement.style.setProperty('--app-height', Math.round(h) + 'px');
+            }}
+            updateAppHeight();
+            window.addEventListener('resize', updateAppHeight);
+            window.addEventListener('orientationchange', updateAppHeight);
+            if (window.visualViewport) {{
+                window.visualViewport.addEventListener('resize', updateAppHeight);
+            }}
+            document.addEventListener('DOMContentLoaded', updateAppHeight);
+        }})();
+    </script>
     <script type="application/ld+json">
     {home_json_ld}
     </script>

@@ -1,5 +1,21 @@
 // Mobile navigation menu toggle, Masonry Layout, Back-to-Top Button & Speculative Preloader
+function initAppHeight() {
+    function update() {
+        const h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+        document.documentElement.style.setProperty('--app-height', Math.round(h) + 'px');
+    }
+    update();
+    window.addEventListener('resize', update);
+    window.addEventListener('orientationchange', update);
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', update);
+    }
+}
+initAppHeight();
+
 document.addEventListener('DOMContentLoaded', () => {
+    initAppHeight();
+
     // 1. Mobile Menu Toggle
     const menuToggle = document.getElementById('menu-toggle');
     const siteNav = document.getElementById('site-nav');
