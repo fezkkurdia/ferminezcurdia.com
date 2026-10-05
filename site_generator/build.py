@@ -323,7 +323,7 @@ class SiteBuilder:
                         </svg>
                     </div>
                 </a>
-                <a href="https://www.facebook.com/" target="_blank" rel="noopener" class="social-link facebook" title="Facebook" aria-label="Facebook">
+                <a href="https://www.facebook.com/fermin.ezcurdia" target="_blank" rel="noopener" class="social-link facebook" title="Facebook" aria-label="Facebook">
                     <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
                         <circle cx="12" cy="12" r="11" fill="#1877F2"/>
                         <path d="M14.8 12.2h-2.1v6.8h-2.8v-6.8H8.5V9.8h1.4V8.1c0-1.9 1.1-3.1 3-3.1.9 0 1.9.1 1.9.1v2.1h-1.1c-1 0-1.2.6-1.2 1.2v1.4h2.5l-.2 2.4z" fill="#ffffff"/>
