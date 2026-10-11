@@ -15,7 +15,7 @@ Esta guía explica cómo se actualiza [ferminezcurdia.com](https://ferminezcurdi
    👉 `INSTALAR_ACCESOS_DIRECTOS.bat` (Windows) o `INSTALAR_ACCESOS_DIRECTOS.command` (Mac).
 
    El instalador:
-   * Crea 3 iconos en el Escritorio: **`📸 FOTOS DE MI WEB`**, **`🖼️ FOTOS DE LA PORTADA`** y **`🚀 ACTUALIZAR MI WEB`**.
+   * Crea 3 iconos en el Escritorio: **`FOTOS DE MI WEB`**, **`FOTOS DE LA PORTADA`** y **`ACTUALIZAR MI WEB`**.
    * Configura el nombre con el que se guardan los cambios ("Fermín Ezcurdia").
    * **Comprueba el acceso a GitHub.** La primera vez se abre una ventana para iniciar sesión en GitHub: entra con una cuenta que tenga permiso de escritura en el repositorio (la de Fermín añadida como colaborador, o la de Iñigo). Windows (o el Llavero del Mac) guarda la sesión y Fermín no vuelve a verla.
 
@@ -26,7 +26,7 @@ Esta guía explica cómo se actualiza [ferminezcurdia.com](https://ferminezcurdi
 ## 📝 Uso diario para Fermín
 
 ### Paso 1: Abrir la carpeta de fotos
-En el Escritorio, doble clic en 👉 **`📸 FOTOS DE MI WEB`**.
+En el Escritorio, doble clic en 👉 **`FOTOS DE MI WEB`**.
 
 Verás una carpeta por galería:
 * `01_people`
@@ -37,7 +37,7 @@ Verás una carpeta por galería:
 * `06_cities`
 * `07_bw`
 
-Para las fotos que pasan a pantalla completa en la página de inicio, usa 👉 **`🖼️ FOTOS DE LA PORTADA`**.
+Para las fotos que pasan a pantalla completa en la página de inicio, usa 👉 **`FOTOS DE LA PORTADA`**.
 
 ---
 
@@ -51,7 +51,7 @@ Para las fotos que pasan a pantalla completa en la página de inicio, usa 👉 *
 Los archivos que no son fotos (vídeos, documentos, RAW como `.CR2` o `.NEF`) no se publican: el botón te avisa de ellos.
 
 #### B) Crear una galería nueva
-1. Crea una carpeta nueva dentro de `📸 FOTOS DE MI WEB`.
+1. Crea una carpeta nueva dentro de `FOTOS DE MI WEB`.
 2. Ponle un número y el nombre (por ejemplo `08_japón` o `08_retratos`). El número decide su posición en el menú; el nombre es lo que se ve en el menú (en mayúsculas).
 3. Pega las fotos dentro. Las fotos deben ir directamente en la carpeta de la galería, no en subcarpetas.
 
@@ -66,7 +66,7 @@ Bórrala de su carpeta. Al publicar desaparece de la web por completo.
 ---
 
 ### Paso 3: Publicar
-Cuando hayas terminado, doble clic en 👉 **`🚀 ACTUALIZAR MI WEB`**.
+Cuando hayas terminado, doble clic en 👉 **`ACTUALIZAR MI WEB`**.
 
 Se abre una ventana que:
 1. Revisa tus fotos (y reduce las grandes).
