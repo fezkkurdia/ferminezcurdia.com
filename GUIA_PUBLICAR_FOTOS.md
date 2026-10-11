@@ -1,82 +1,87 @@
 # 📸 Guía para Actualizar la Web - Fermín Ezcurdia
 
-Esta guía explica el funcionamiento del sistema de actualización en 1 clic para [ferminezcurdia.com](https://ferminezcurdia.com). No requiere conocimientos informáticos: todo se gestiona con carpetas normales de Windows y un botón en el Escritorio.
+Esta guía explica cómo se actualiza [ferminezcurdia.com](https://ferminezcurdia.com). No requiere conocimientos informáticos: todo se hace con carpetas normales del ordenador y un icono en el Escritorio.
 
 ---
 
-## ⚙️ Configuración Inicial (Hacer solo la primera vez en el ordenador de Fermín)
+## ⚙️ Configuración inicial (solo la primera vez, la hace Iñigo)
 
-Tú (Iñigo) dejas esto preparado en su equipo en 2 minutos:
-
-1. **Tener Git instalado:** Si no lo tiene, descarga e instala [git-scm.com](https://git-scm.com/) (marcando opciones por defecto).
-2. **Clonar el repositorio:** En una carpeta fija (por ejemplo `C:\ferminezcurdia.com` o en `Documentos`):
+1. **Instalar Git:** descárgalo de [git-scm.com](https://git-scm.com/) e instálalo con las opciones por defecto (en Mac basta con abrir el Terminal y escribir `xcode-select --install`).
+2. **Descargar la web** en una carpeta fija (por ejemplo `C:\ferminezcurdia.com` o `Documentos`):
    ```bash
    git clone https://github.com/fezkkurdia/ferminezcurdia.com.git
    ```
-3. **Crear los accesos directos:**
-   Haz doble clic sobre el archivo:
-   👉 `INSTALAR_ACCESOS_DIRECTOS.bat`
-   
-   *Listo:* En el Escritorio de Fermín aparecerán automáticamente 2 iconos:
-   * **`📸 FOTOS DE MI WEB`**
-   * **`🚀 ACTUALIZAR MI WEB`**
+3. **Instalar los accesos directos:** doble clic en
+   👉 `INSTALAR_ACCESOS_DIRECTOS.bat` (Windows) o `INSTALAR_ACCESOS_DIRECTOS.command` (Mac).
+
+   El instalador:
+   * Crea 3 iconos en el Escritorio: **`📸 FOTOS DE MI WEB`**, **`🖼️ FOTOS DE LA PORTADA`** y **`🚀 ACTUALIZAR MI WEB`**.
+   * Configura el nombre con el que se guardan los cambios ("Fermín Ezcurdia").
+   * **Comprueba el acceso a GitHub.** La primera vez se abre una ventana para iniciar sesión en GitHub: entra con una cuenta que tenga permiso de escritura en el repositorio (la de Fermín añadida como colaborador, o la de Iñigo). Windows (o el Llavero del Mac) guarda la sesión y Fermín no vuelve a verla.
+
+> **Si el ordenador de Fermín ya estaba configurado con la versión anterior**, abre una vez una terminal en la carpeta de la web y ejecuta `git pull`, y luego vuelve a lanzar el instalador para que aparezca el icono de la portada. El botón antiguo no sabía descargar los cambios de Iñigo y fallaría.
 
 ---
 
-## 📝 Tutorial de Uso Diario para Fermín
+## 📝 Uso diario para Fermín
 
 ### Paso 1: Abrir la carpeta de fotos
-En el Escritorio de tu ordenador, haz doble clic sobre el icono:  
-👉 **`📸 FOTOS DE MI WEB`**
+En el Escritorio, doble clic en 👉 **`📸 FOTOS DE MI WEB`**.
 
-Verás las carpetas de las distintas galerías:
+Verás una carpeta por galería:
 * `01_people`
 * `02_nature`
 * `03_rituals`
-* `04_traditions`
+* `04_celebrations`
 * `05_religion`
 * `06_cities`
 * `07_bw`
+
+Para las fotos que pasan a pantalla completa en la página de inicio, usa 👉 **`🖼️ FOTOS DE LA PORTADA`**.
 
 ---
 
 ### Paso 2: Trabajar con las fotos
 
-#### A) Para añadir fotos a una galería existente:
-1. Abre la carpeta correspondiente (por ejemplo, `02_nature`).
-2. Copia y pega ahí tus fotos originales directamente desde tu cámara o Lightroom.
-3. No te preocupes por el tamaño ni los megabytes: el sistema las optimizará automáticamente.
+#### A) Añadir fotos a una galería
+1. Abre la carpeta de la galería (por ejemplo, `02_nature`).
+2. Pega ahí tus fotos (JPG es lo mejor; también valen PNG, TIFF y las HEIC del iPhone).
+3. No te preocupes por el tamaño: al publicar, las fotos muy grandes se reducen automáticamente a tamaño web (3000 píxeles) **dentro de esta carpeta**. Tus originales de la cámara o de Lightroom no se tocan, así que guárdalos donde siempre.
 
-#### B) Para crear una Galería Nueva:
+Los archivos que no son fotos (vídeos, documentos, RAW como `.CR2` o `.NEF`) no se publican: el botón te avisa de ellos.
+
+#### B) Crear una galería nueva
 1. Crea una carpeta nueva dentro de `📸 FOTOS DE MI WEB`.
-2. Ponle un número y el nombre de la temática (ejemplo: `08_japon` o `08_retratos`).
-3. Pega las fotos en su interior. La web creará la nueva sección en el menú automáticamente.
+2. Ponle un número y el nombre (por ejemplo `08_japón` o `08_retratos`). El número decide su posición en el menú; el nombre es lo que se ve en el menú (en mayúsculas).
+3. Pega las fotos dentro. Las fotos deben ir directamente en la carpeta de la galería, no en subcarpetas.
 
-#### C) Para borrar una foto:
-* Si quieres retirar una foto de la web, simplemente elimínala de su carpeta.
+#### C) Retirar una foto
+Bórrala de su carpeta. Al publicar desaparece de la web por completo.
 
-#### D) Para controlar el orden y los títulos:
-* **Títulos:** Si tu cámara o Lightroom guardan título en la foto, se usará ese. Si no, se usará el nombre del archivo.
-* **Orden:** Las fotos se ordenan por su nombre alfabético. Si quieres un orden concreto, nómbralas así: `01_foto.jpg`, `02_foto.jpg`, `03_foto.jpg`, etc.
-
----
-
-### Paso 3: Publicar los cambios en la Web
-Cuando hayas terminado de organizar tus fotos:
-
-1. Ve a tu Escritorio y haz doble clic sobre:  
-   👉 **`🚀 ACTUALIZAR MI WEB`**
-2. Se abrirá una pequeña ventana que te informará del proceso:
-   * Te dirá que está preparando las fotos nuevas.
-   * Las subirá al servidor.
-   * Cuando termine, saldrá un mensaje en verde:  
-     `¡TODO LISTO! TUS FOTOS SE HAN SUBIDO CON ÉXITO`.
-3. Pulsa cualquier tecla para cerrar la ventana.
+#### D) Orden y títulos
+* **Orden:** si quieres que unas fotos salgan las primeras y en un orden concreto, ponles un número delante: `01_pescador.jpg`, `02_templo.jpg`... El resto va detrás: primero las que ya estaban en la web antigua, en su orden de siempre, y luego las demás por nombre.
+* **Títulos:** si pones título a la foto en Lightroom (campo *Título*), se usa ese. Si no, se usa el nombre del archivo sin el número (`01_Pescador_en_el_rio.jpg` → *Pescador en el rio*).
+* **Cuidado al renombrar galerías:** cambiar solo el número (`02_nature` → `05_nature`) es seguro. Cambiar la palabra (`nature` → `naturaleza`) cambia la dirección de esa galería en internet.
 
 ---
 
-### Paso 4: Comprobar tu Web
-En aproximadamente **1 minuto**, abre tu navegador y visita:  
-🌐 **[https://ferminezcurdia.com](https://ferminezcurdia.com)**
+### Paso 3: Publicar
+Cuando hayas terminado, doble clic en 👉 **`🚀 ACTUALIZAR MI WEB`**.
 
-Tus fotos nuevas ya estarán visibles con máxima resolución y velocidad.
+Se abre una ventana que:
+1. Revisa tus fotos (y reduce las grandes).
+2. Guarda los cambios.
+3. Los sube a internet.
+4. **Espera a que la web se actualice** (normalmente entre 2 y 5 minutos) y te lo confirma.
+
+Lo que puedes ver al final:
+* 🟢 **¡TODO LISTO! TUS FOTOS YA ESTÁN EN LA WEB** — Perfecto. Si debajo aparece algún aviso en amarillo (por ejemplo, una foto dañada), esa foto concreta no se ha publicado.
+* 🟡 **TUS FOTOS ESTÁN SUBIDAS, PERO LA WEB AÚN NO HA CAMBIADO** — Mira la web un poco más tarde. Si al día siguiente sigue igual, avisa a Iñigo.
+* 🔴 **NO SE HA PUBLICADO: ...** — Lee el mensaje: normalmente es que no hay internet. Tus fotos no se pierden; vuelve a pulsar el icono más tarde. Si se repite, avisa a Iñigo (el detalle técnico en gris es para él).
+
+Puedes cerrar la ventana cuando quieras: lo que ya se ha subido se publica igualmente.
+
+---
+
+### Paso 4: Comprobar la web
+Abre 🌐 **[https://ferminezcurdia.com](https://ferminezcurdia.com)**. Si no ves los cambios, recarga la página con `Ctrl + F5` (Windows) o `Cmd + Mayúsculas + R` (Mac).
