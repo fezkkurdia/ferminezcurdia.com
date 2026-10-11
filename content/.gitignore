@@ -1,0 +1,14 @@
+# Solo se publican fotos. Cualquier otro archivo que caiga en estas carpetas
+# (vídeos, documentos, RAW...) se queda en el ordenador y el botón de publicar
+# avisa de ello.
+*
+!*/
+!.gitignore
+!*.[jJ][pP][gG]
+!*.[jJ][pP][eE][gG]
+!*.[pP][nN][gG]
+!*.[wW][eE][bB][pP]
+!*.[tT][iI][fF]
+!*.[tT][iI][fF][fF]
+!*.[hH][eE][iI][cC]
+!*.[hH][eE][iI][fF]

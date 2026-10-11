@@ -11,8 +11,21 @@ import json
 import re
 import shutil
 import hashlib
+import html
+import io
+import subprocess
+import unicodedata
+from datetime import datetime, timezone
 from pathlib import Path
-from PIL import Image, ImageOps
+from PIL import Image, ImageOps, ImageCms, IptcImagePlugin
+
+# HEIC/HEIF (iPhone) support, optional so local builds work without it
+try:
+    from pillow_heif import register_heif_opener
+    register_heif_opener()
+    HEIF_SUPPORTED = True
+except ImportError:
+    HEIF_SUPPORTED = False
 
 # Paths
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,12 +38,63 @@ TEMPLATES_DIR = SITE_GENERATOR_DIR / "templates"
 DIST_DIR = BASE_DIR / "dist"
 CACHE_FILE = BASE_DIR / ".cache" / "images_cache.json"
 METADATA_FILE = BASE_DIR / "existing_site_metadata.json"
+STATUS_FILENAME = "estado-publicacion.json"
 
 # Settings
 THUMB_HEIGHT = 360
 DISPLAY_MAX_DIM = 2560  # Ultra-crisp 4K/Retina display resolution
 JPG_QUALITY = 84
 WEBP_QUALITY = 82
+# Bump when image processing changes so cached outputs are regenerated
+PROCESSING_VERSION = 2
+
+IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".tif", ".tiff"}
+if HEIF_SUPPORTED:
+    IMAGE_EXTENSIONS |= {".heic", ".heif"}
+
+# Numbering prefix the photographer uses to force an order (01_, 2-, 003 ...).
+# Limited to 4 digits so Flickr-style ids (51197730626_...) don't count.
+ORDER_PREFIX_RE = re.compile(r'^(\d{1,4})[\s_-]+')
+
+# Fixed URLs and menu labels of the original galleries, keyed by folder name
+# without its number so renumbering a folder keeps its URL.
+GALLERY_OVERRIDES = {
+    "people": ("people", "PEOPLE"),
+    "nature": ("nature", "NATURE"),
+    "rituals": ("rituals", "RITUALS & TRADITIONS"),
+    "celebrations": ("traditions", "CELEBRATIONS"),
+    "religion": ("religion", "RELIGION"),
+    "cities": ("cities", "CITIES"),
+    "bw": ("bw", "B/W"),
+}
+
+# Text some cameras write into ImageDescription that is not a real title
+JUNK_DESCRIPTIONS = re.compile(
+    r'^(|.*digital camera.*|sony dsc|default|untitled|image|picture|photo|'
+    r'samsung|lg digital camera|kodak.*|minolta.*|sanyo.*|cimg\d*|dsc\w*|img_?\d*)$',
+    re.IGNORECASE)
+
+SRGB_PROFILE = ImageCms.createProfile("sRGB")
+
+def friendly_path(path: Path) -> str:
+    """How the photographer sees a content path: «08_japon/foto.jpg» or «portada/foto.jpg»."""
+    rel = path.relative_to(CONTENT_DIR).as_posix()
+    if rel.startswith("galleries/"):
+        return rel[len("galleries/"):]
+    if rel.startswith("home_slides/"):
+        return "portada/" + rel[len("home_slides/"):]
+    return rel
+
+def strip_number_prefix(name: str) -> str:
+    return ORDER_PREFIX_RE.sub('', name)
+
+def natural_key(text: str):
+    return [int(t) if t.isdigit() else t for t in re.split(r'(\d+)', text.lower())]
+
+def slugify(text: str) -> str:
+    text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode("ascii")
+    text = re.sub(r'[^a-zA-Z0-9]+', '-', text).strip('-').lower()
+    return text or "galeria"
 
 # Clean Title Formatter
 def format_title_from_filename(filename: str) -> str:
@@ -41,19 +105,69 @@ def format_title_from_filename(filename: str) -> str:
     clean = re.sub(r'[\s_-]+', ' ', stem).strip()
     return clean
 
-# Extract EXIF title if available
-def get_exif_title(img: Image.Image) -> str:
+def _decode(value) -> str:
+    if isinstance(value, list):
+        value = value[0] if value else b""
+    if isinstance(value, bytes):
+        for enc in ("utf-8", "latin-1"):
+            try:
+                return value.decode(enc).strip()
+            except UnicodeDecodeError:
+                continue
+    return str(value).strip() if value else ""
+
+# Title written by Lightroom/Photoshop (XMP dc:title, IPTC Title) or the camera (EXIF)
+def get_embedded_title(img: Image.Image) -> str:
     try:
-        exif = img.getexif()
-        if not exif:
-            return ""
-        # 0x010e = ImageDescription
-        desc = exif.get(0x010e)
-        if desc and isinstance(desc, str):
-            return desc.strip()
+        xmp = img.info.get("xmp") or img.info.get("XML:com.adobe.xmp")
+        if xmp:
+            if isinstance(xmp, bytes):
+                xmp = xmp.decode("utf-8", "ignore")
+            m = re.search(r'<dc:title>.*?<rdf:li[^>]*>(.*?)</rdf:li>', xmp, re.DOTALL)
+            if m and m.group(1).strip():
+                return html.unescape(m.group(1).strip())
+    except Exception:
+        pass
+    try:
+        iptc = IptcImagePlugin.getiptcinfo(img) or {}
+        title = _decode(iptc.get((2, 5)))  # IPTC Object Name = Lightroom "Title"
+        if title:
+            return title
+    except Exception:
+        pass
+    try:
+        desc = img.getexif().get(0x010e)  # EXIF ImageDescription
+        desc = _decode(desc)
+        if desc and not JUNK_DESCRIPTIONS.match(desc):
+            return desc
     except Exception:
         pass
     return ""
+
+def to_srgb(img: Image.Image) -> Image.Image:
+    """Converts any colour space (Adobe RGB, ProPhoto, CMYK...) to sRGB for the web."""
+    icc = img.info.get("icc_profile")
+    if icc:
+        try:
+            src = ImageCms.ImageCmsProfile(io.BytesIO(icc))
+            if "srgb" in ImageCms.getProfileDescription(src).lower() and img.mode in ("RGB", "RGBA"):
+                return img  # already web colours
+            out_mode = "RGBA" if img.mode in ("RGBA", "LA", "PA") else "RGB"
+            if img.mode not in ("RGB", "RGBA", "CMYK", "L"):
+                img = img.convert("RGBA" if out_mode == "RGBA" else "RGB")
+            return ImageCms.profileToProfile(img, src, SRGB_PROFILE, outputMode=out_mode)
+        except Exception:
+            pass
+    if img.mode in ("RGBA", "LA", "PA") or (img.mode == "P" and "transparency" in img.info):
+        return img.convert("RGBA")
+    return img.convert("RGB") if img.mode != "RGB" else img
+
+def flatten(img: Image.Image) -> Image.Image:
+    if img.mode == "RGBA":
+        bg = Image.new("RGB", img.size, (22, 22, 22))  # site background (#161616)
+        bg.paste(img, mask=img.split()[3])
+        return bg
+    return img.convert("RGB") if img.mode != "RGB" else img
 
 def compute_file_hash(filepath: Path) -> str:
     h = hashlib.sha256()
@@ -68,6 +182,8 @@ class SiteBuilder:
         self.metadata = self.load_metadata()
         self.galleries = []
         self.home_slides = []
+        self.expected_files = set()
+        self.warnings = []
 
     def load_cache(self) -> dict:
         if CACHE_FILE.exists():
@@ -92,70 +208,65 @@ class SiteBuilder:
                 pass
         return {}
 
-    def process_image(self, src_path: Path, dest_gallery_dir: Path):
-        """Generates thumb and display versions in both JPG and WebP format."""
+    def process_image(self, src_path: Path, dest_gallery_dir: Path, out_stem: str, display_jpg_needed: bool = False):
+        """Generates thumb (WebP + JPG fallback) and display (WebP, plus JPG when used
+        as a social sharing image) versions, converted to sRGB."""
         file_hash = compute_file_hash(src_path)
-        cache_key = f"{src_path.name}_{file_hash}_{DISPLAY_MAX_DIM}"
+        out_dir = dest_gallery_dir.relative_to(DIST_DIR).as_posix()
+        cache_key = f"{out_dir}/{out_stem}_{file_hash}_{DISPLAY_MAX_DIM}_v{PROCESSING_VERSION}"
 
         thumb_dir = dest_gallery_dir / "thumbs"
         display_dir = dest_gallery_dir / "display"
         thumb_dir.mkdir(parents=True, exist_ok=True)
         display_dir.mkdir(parents=True, exist_ok=True)
 
-        stem = src_path.stem
-        thumb_jpg = thumb_dir / f"{stem}.jpg"
-        thumb_webp = thumb_dir / f"{stem}.webp"
-        display_jpg = display_dir / f"{stem}.jpg"
-        display_webp = display_dir / f"{stem}.webp"
+        thumb_jpg = thumb_dir / f"{out_stem}.jpg"
+        thumb_webp = thumb_dir / f"{out_stem}.webp"
+        display_jpg = display_dir / f"{out_stem}.jpg"
+        display_webp = display_dir / f"{out_stem}.webp"
+
+        outputs = [thumb_jpg, thumb_webp, display_webp]
+        if display_jpg_needed:
+            outputs.append(display_jpg)
+        self.expected_files.update(outputs)
 
         # Check if already cached and exists
-        if cache_key in self.cache:
-            c = self.cache[cache_key]
-            if (thumb_jpg.exists() and thumb_webp.exists() and
-                display_jpg.exists() and display_webp.exists()):
-                return c
+        if cache_key in self.cache and all(o.exists() for o in outputs):
+            return self.cache[cache_key]
 
         # Process image
         with Image.open(src_path) as orig:
-            # Auto-orient based on EXIF
-            img = ImageOps.exif_transpose(orig)
+            orig.load()
+            title = get_embedded_title(orig)
+            # Auto-orient based on EXIF, then normalise colours to sRGB
+            img = to_srgb(ImageOps.exif_transpose(orig))
             orig_w, orig_h = img.size
-            title = get_exif_title(img)
 
             # 1. Display version (max 2560px for Retina / 4K)
             scale = min(1.0, DISPLAY_MAX_DIM / max(orig_w, orig_h))
-            disp_w = int(orig_w * scale)
-            disp_h = int(orig_h * scale)
+            disp_w = max(1, int(orig_w * scale))
+            disp_h = max(1, int(orig_h * scale))
             if scale < 1.0:
                 disp_img = img.resize((disp_w, disp_h), Image.Resampling.LANCZOS)
             else:
                 disp_img = img.copy()
 
-            # Convert to RGB if needed (strip alpha for JPEG)
-            if disp_img.mode in ("RGBA", "P"):
-                disp_rgb = disp_img.convert("RGB")
-            else:
-                disp_rgb = disp_img
-
-            disp_rgb.save(display_jpg, "JPEG", quality=JPG_QUALITY, optimize=True)
+            disp_rgb = flatten(disp_img)
             disp_rgb.save(display_webp, "WEBP", quality=WEBP_QUALITY)
+            if display_jpg_needed:
+                disp_rgb.save(display_jpg, "JPEG", quality=JPG_QUALITY, optimize=True)
 
             # 2. Thumbnail version (fixed height 360px for mosaic)
-            t_scale = THUMB_HEIGHT / orig_h
-            t_w = int(orig_w * t_scale)
+            t_scale = THUMB_HEIGHT / disp_h
+            t_w = max(1, int(disp_w * t_scale))
             t_h = THUMB_HEIGHT
-            t_img = disp_img.resize((t_w, t_h), Image.Resampling.LANCZOS)
-            if t_img.mode in ("RGBA", "P"):
-                t_rgb = t_img.convert("RGB")
-            else:
-                t_rgb = t_img
-
+            t_rgb = disp_rgb.resize((t_w, t_h), Image.Resampling.LANCZOS)
             t_rgb.save(thumb_jpg, "JPEG", quality=JPG_QUALITY, optimize=True)
             t_rgb.save(thumb_webp, "WEBP", quality=WEBP_QUALITY)
 
         info = {
             "filename": src_path.name,
-            "stem": stem,
+            "stem": out_stem,
             "orig_width": orig_w,
             "orig_height": orig_h,
             "disp_width": disp_w,
@@ -168,44 +279,82 @@ class SiteBuilder:
         self.cache[cache_key] = info
         return info
 
+    def safe_process(self, src_path: Path, dest_dir: Path, out_stem: str, display_jpg_needed: bool = False):
+        """Like process_image, but a broken photo is skipped with a warning instead of
+        stopping the whole build (and leaving the website un-updated)."""
+        try:
+            return self.process_image(src_path, dest_dir, out_stem, display_jpg_needed)
+        except Exception as e:
+            rel = friendly_path(src_path)
+            print(f"  [AVISO] No se ha podido procesar {rel}: {e}")
+            self.warnings.append(f"La foto «{rel}» no se ha podido publicar (el archivo parece dañado o no es una imagen válida).")
+            return None
+
+    def list_images(self, folder: Path) -> list:
+        """Image files of a folder; anything else is reported (except system files)."""
+        images = []
+        for f in folder.iterdir():
+            if f.name.startswith(".") or f.name.lower() in ("thumbs.db", "desktop.ini"):
+                continue
+            if f.is_dir():
+                self.warnings.append(f"La carpeta «{friendly_path(f)}» está dentro de una galería: sus fotos no se muestran. "
+                                     "Saca las fotos de esa carpeta o conviértela en una galería propia.")
+            elif f.suffix.lower() in IMAGE_EXTENSIONS:
+                images.append(f)
+            else:
+                self.warnings.append(f"«{friendly_path(f)}» no es un tipo de foto que la web pueda mostrar (usa JPG).")
+        return images
+
+    @staticmethod
+    def unique_stems(files: list) -> dict:
+        """Output name per file; foto.jpg and foto.png in one folder must not overwrite each other."""
+        counts = {}
+        for f in files:
+            counts[f.stem.lower()] = counts.get(f.stem.lower(), 0) + 1
+        return {f: (f.stem if counts[f.stem.lower()] == 1 else f"{f.stem}-{f.suffix.lstrip('.').lower()}")
+                for f in files}
+
     def discover_galleries(self):
         if not GALLERIES_DIR.exists():
             return []
 
-        folder_list = sorted([d for d in GALLERIES_DIR.iterdir() if d.is_dir()])
+        folder_list = sorted([d for d in GALLERIES_DIR.iterdir() if d.is_dir() and not d.name.startswith(".")],
+                             key=lambda d: natural_key(d.name))
         galleries_data = []
+        used_slugs = set()
 
-        slug_map = {
-            "01_people": ("people", "PEOPLE"),
-            "02_nature": ("nature", "NATURE"),
-            "03_rituals": ("rituals", "RITUALS & TRADITIONS"),
-            "04_celebrations": ("traditions", "CELEBRATIONS"),
-            "05_religion": ("religion", "RELIGION"),
-            "06_cities": ("cities", "CITIES"),
-            "07_bw": ("bw", "B/W"),
-        }
+        # Legacy WordPress metadata, findable even if the folder gets renumbered
+        legacy_by_name = {strip_number_prefix(k): v for k, v in self.metadata.items()}
 
         for folder in folder_list:
             raw_name = folder.name
-            if raw_name in slug_map:
-                slug, label = slug_map[raw_name]
+            clean = strip_number_prefix(raw_name).strip() or raw_name
+            override = GALLERY_OVERRIDES.get(clean.lower())
+            if override:
+                slug, label = override
             else:
-                clean = re.sub(r'^\d+[\s_-]*', '', raw_name)
-                slug = clean.lower().replace(" ", "-").replace("_", "-")
-                label = clean.replace("-", " ").replace("_", " ").upper()
+                slug = slugify(clean)
+                label = re.sub(r'[_-]+', ' ', clean).strip().upper()
+            base_slug, n = slug, 2
+            while slug in used_slugs or slug == "assets":
+                slug, n = f"{base_slug}-{n}", n + 1
+            used_slugs.add(slug)
 
-            extensions = {".jpg", ".jpeg", ".png", ".webp"}
-            image_files = [f for f in folder.iterdir() if f.is_file() and f.suffix.lower() in extensions]
+            image_files = self.list_images(folder)
 
-            existing_meta_list = self.metadata.get(raw_name, [])
+            existing_meta_list = self.metadata.get(raw_name) or legacy_by_name.get(clean, [])
             meta_by_filename = {item.get("filename"): item for item in existing_meta_list if "filename" in item}
+            legacy_order = {item.get("filename"): idx for idx, item in enumerate(existing_meta_list)}
 
+            # 1) photos the photographer numbered (01_, 02_...), in that order
+            # 2) photos from the old website, in their original order
+            # 3) everything else, by name
             def sort_key(f: Path):
-                if f.name in meta_by_filename:
-                    for idx, m in enumerate(existing_meta_list):
-                        if m.get("filename") == f.name:
-                            return (0, idx)
-                return (1, f.name.lower())
+                if f.name not in legacy_order and ORDER_PREFIX_RE.match(f.name):
+                    return (0, 0, natural_key(f.name))
+                if f.name in legacy_order:
+                    return (1, legacy_order[f.name], [])
+                return (2, 0, natural_key(f.name))
 
             image_files.sort(key=sort_key)
 
@@ -223,10 +372,53 @@ class SiteBuilder:
     def discover_home_slides(self):
         if not HOME_SLIDES_DIR.exists():
             return []
-        extensions = {".jpg", ".jpeg", ".png", ".webp"}
-        files = [f for f in HOME_SLIDES_DIR.iterdir() if f.is_file() and f.suffix.lower() in extensions]
-        files.sort(key=lambda x: x.name)
+        files = self.list_images(HOME_SLIDES_DIR)
+        files.sort(key=lambda x: natural_key(x.name))
         return files
+
+    def legacy_title(self, filename: str, meta_by_filename: dict) -> str:
+        meta = meta_by_filename.get(filename) or meta_by_filename.get(strip_number_prefix(filename)) or {}
+        return meta.get("title") or ""
+
+    def remove_stale_outputs(self, gallery_slugs: list):
+        """Deletes processed images and pages of photos/galleries that no longer exist,
+        so a removed photo is really gone from the website."""
+        removed = 0
+        images_root = DIST_DIR / "assets" / "images"
+        for sub in ("home", "galleries"):
+            root = images_root / sub
+            if not root.exists():
+                continue
+            for f in root.rglob("*"):
+                if f.is_file() and f not in self.expected_files:
+                    f.unlink()
+                    removed += 1
+            for d in sorted((d for d in root.rglob("*") if d.is_dir()), key=lambda d: len(d.parts), reverse=True):
+                if not any(d.iterdir()):
+                    d.rmdir()
+        for d in DIST_DIR.iterdir():
+            if d.is_dir() and d.name != "assets" and d.name not in gallery_slugs and (d / "index.html").exists():
+                shutil.rmtree(d)
+                removed += 1
+        if removed:
+            print(f"  [Cleanup] Removed {removed} stale files/pages.")
+
+    def write_status(self):
+        """Small public file the publish button reads to confirm the new version is live."""
+        commit = os.environ.get("GITHUB_SHA", "")
+        if not commit:
+            try:
+                commit = subprocess.run(["git", "rev-parse", "HEAD"], cwd=BASE_DIR, capture_output=True,
+                                        text=True, check=True).stdout.strip()
+            except Exception:
+                commit = ""
+        status = {
+            "commit": commit,
+            "fecha": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            "avisos": self.warnings,
+        }
+        with open(DIST_DIR / STATUS_FILENAME, "w", encoding="utf-8") as f:
+            json.dump(status, f, ensure_ascii=False, indent=2)
 
     def build(self):
         print("=== Starting Build for ferminezcurdia.com ===")
@@ -257,12 +449,16 @@ class SiteBuilder:
         dist_home_images = dist_assets / "images" / "home"
         dist_home_images.mkdir(parents=True, exist_ok=True)
         processed_slides = []
+        home_stems = self.unique_stems(home_slide_files)
         for sf in home_slide_files:
-            info = self.process_image(sf, dist_home_images)
+            # The first slide doubles as the social sharing image, which needs a JPG
+            info = self.safe_process(sf, dist_home_images, home_stems[sf], display_jpg_needed=not processed_slides)
+            if not info:
+                continue
             processed_slides.append({
                 "filename": sf.name,
-                "jpg_url": f"/assets/images/home/display/{info['stem']}.jpg",
                 "webp_url": f"/assets/images/home/display/{info['stem']}.webp",
+                "jpg_url": f"/assets/images/home/display/{info['stem']}.jpg",
             })
         print(f"  [Home] Processed {len(processed_slides)} hero slides.")
 
@@ -274,10 +470,14 @@ class SiteBuilder:
             print(f"  [Gallery] Processing {g['label']} ({len(g['image_files'])} images)...")
 
             photos = []
+            stems = self.unique_stems(g["image_files"])
             for img_path in g["image_files"]:
-                info = self.process_image(img_path, g_dest_dir)
-                meta = g["meta_by_filename"].get(img_path.name, {})
-                title = meta.get("title") or info.get("exif_title") or format_title_from_filename(img_path.name)
+                # The first photo is the gallery's social sharing image (needs a JPG)
+                info = self.safe_process(img_path, g_dest_dir, stems[img_path], display_jpg_needed=not photos)
+                if not info:
+                    continue
+                title = (self.legacy_title(img_path.name, g["meta_by_filename"])
+                         or info.get("exif_title") or format_title_from_filename(img_path.name))
 
                 photos.append({
                     "filename": img_path.name,
@@ -293,16 +493,30 @@ class SiteBuilder:
                     "full_jpg": f"/assets/images/galleries/{g['slug']}/display/{info['stem']}.jpg",
                 })
 
+            if not photos:
+                print(f"  [Gallery] {g['label']} has no photos, left out of the menu.")
+                continue
+
             processed_galleries.append({
                 "slug": g["slug"],
                 "label": g["label"],
                 "photos": photos
             })
 
+        # Forget cache entries of photos that no longer exist
+        used = {str(p) for p in self.expected_files}
+        self.cache = {k: v for k, v in self.cache.items()
+                      if str(DIST_DIR / k.rsplit("/", 1)[0] / "thumbs" / f"{v['stem']}.webp") in used}
         self.save_cache()
 
         # 6. Render HTML pages
         self.render_pages(processed_slides, processed_galleries)
+        self.remove_stale_outputs([g["slug"] for g in processed_galleries])
+        self.write_status()
+        if self.warnings:
+            print("  [Avisos]")
+            for w in self.warnings:
+                print(f"    - {w}")
         print("=== Build Complete! Site generated in dist/ ===")
 
     def get_social_links_html(self, container_class: str = "social-nav") -> str:
