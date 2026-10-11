@@ -20,14 +20,14 @@ fi
 echo "[OK] Los cambios se guardarán a nombre de: $(git config user.name) <$(git config user.email)>"
 
 chmod +x "$REPO/PUBLICAR_WEB.command" "$REPO/scripts/publicar.sh"
-ln -sfn "$REPO/content/galleries" "$ESCRITORIO/📸 FOTOS DE MI WEB"
-ln -sfn "$REPO/content/home_slides" "$ESCRITORIO/🖼️ FOTOS DE LA PORTADA"
+ln -sfn "$REPO/content/galleries" "$ESCRITORIO/FOTOS DE MI WEB"
+ln -sfn "$REPO/content/home_slides" "$ESCRITORIO/FOTOS DE LA PORTADA"
 # Un pequeño lanzador (un enlace no serviría: el botón necesita saber dónde está la web)
-cat > "$ESCRITORIO/🚀 ACTUALIZAR MI WEB.command" <<LANZADOR
+cat > "$ESCRITORIO/ACTUALIZAR MI WEB.command" <<LANZADOR
 #!/bin/bash
 exec /bin/bash "$REPO/scripts/publicar.sh"
 LANZADOR
-chmod +x "$ESCRITORIO/🚀 ACTUALIZAR MI WEB.command"
+chmod +x "$ESCRITORIO/ACTUALIZAR MI WEB.command"
 echo "[OK] Accesos creados en el Escritorio."
 
 echo
@@ -42,7 +42,7 @@ fi
 
 echo
 echo "¡INSTALACIÓN COMPLETADA!"
-echo "  1. 📸 FOTOS DE MI WEB      (galerías: pegar o borrar fotos)"
-echo "  2. 🖼️ FOTOS DE LA PORTADA  (fotos que pasan en la página de inicio)"
-echo "  3. 🚀 ACTUALIZAR MI WEB    (publicar los cambios)"
+echo "  1. FOTOS DE MI WEB      (galerías: pegar o borrar fotos)"
+echo "  2. FOTOS DE LA PORTADA  (fotos que pasan en la página de inicio)"
+echo "  3. ACTUALIZAR MI WEB    (publicar los cambios)"
 read -r -p "Pulsa Intro para cerrar..."

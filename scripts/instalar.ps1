@@ -31,15 +31,15 @@ if (-not ((& git config user.name) 2>$null)) { & git config user.name 'Fermín E
 if (-not ((& git config user.email) 2>$null)) { & git config user.email 'fermin@ferminezcurdia.com' }
 Write-Host "[OK] Los cambios se guardarán a nombre de: $(& git config user.name) <$(& git config user.email)>" -ForegroundColor Green
 
-# 2. Accesos directos
+# 2. Accesos directos (sin emojis en el nombre: WScript.Shell no sabe guardarlos)
 try {
     $escritorio = [Environment]::GetFolderPath('Desktop')
     $ws = New-Object -ComObject WScript.Shell
 
     $accesos = @(
-        @{ Nombre = '📸 FOTOS DE MI WEB'; Destino = (Join-Path $Repo 'content\galleries'); Icono = 'shell32.dll,3' },
-        @{ Nombre = '🖼️ FOTOS DE LA PORTADA'; Destino = (Join-Path $Repo 'content\home_slides'); Icono = 'shell32.dll,3' },
-        @{ Nombre = '🚀 ACTUALIZAR MI WEB'; Destino = (Join-Path $Repo 'PUBLICAR_WEB.bat'); Icono = 'imageres.dll,229' }
+        @{ Nombre = 'FOTOS DE MI WEB'; Destino = (Join-Path $Repo 'content\galleries'); Icono = 'shell32.dll,3' },
+        @{ Nombre = 'FOTOS DE LA PORTADA'; Destino = (Join-Path $Repo 'content\home_slides'); Icono = 'shell32.dll,3' },
+        @{ Nombre = 'ACTUALIZAR MI WEB'; Destino = (Join-Path $Repo 'PUBLICAR_WEB.bat'); Icono = 'imageres.dll,229' }
     )
     foreach ($a in $accesos) {
         $s = $ws.CreateShortcut((Join-Path $escritorio "$($a.Nombre).lnk"))
@@ -74,7 +74,7 @@ Write-Host '           ¡INSTALACIÓN COMPLETADA!' -ForegroundColor Green
 Linea
 Write-Host ''
 Write-Host 'En el Escritorio tienes:'
-Write-Host '  1. 📸 FOTOS DE MI WEB      (galerías: pegar o borrar fotos)'
-Write-Host '  2. 🖼️ FOTOS DE LA PORTADA  (fotos que pasan en la página de inicio)'
-Write-Host '  3. 🚀 ACTUALIZAR MI WEB    (publicar los cambios)'
+Write-Host '  1. FOTOS DE MI WEB      (galerías: pegar o borrar fotos)'
+Write-Host '  2. FOTOS DE LA PORTADA  (fotos que pasan en la página de inicio)'
+Write-Host '  3. ACTUALIZAR MI WEB    (publicar los cambios)'
 Terminar 0
