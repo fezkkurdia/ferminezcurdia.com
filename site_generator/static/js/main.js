@@ -143,6 +143,10 @@ function initMasonry() {
         const totalGaps = (cols - 1) * gap;
         const colWidth = (containerWidth - totalGaps) / cols;
         const colHeights = new Array(cols).fill(0);
+        // How much taller than the shortest column the next column in reading
+        // order may be and still take the next photo
+        const tolerance = colWidth;
+        let prevCol = cols - 1;
 
         items.forEach(item => {
             // Find column with the lowest current height
@@ -153,8 +157,18 @@ function initMasonry() {
                 }
             }
 
-            const x = Math.round(minCol * (colWidth + gap));
-            const y = Math.round(colHeights[minCol]);
+            // Keep the photographer's order readable left to right, row after
+            // row: the next photo goes in the column to the right of the
+            // previous one (or back to the first column), unless that column
+            // has grown too tall compared with the shortest one.
+            let col = (prevCol + 1) % cols;
+            if (colHeights[col] - colHeights[minCol] > tolerance) {
+                col = minCol;
+            }
+            prevCol = col;
+
+            const x = Math.round(col * (colWidth + gap));
+            const y = Math.round(colHeights[col]);
 
             // Calculate height using the precomputed aspect ratio
             const arStr = item.style.getPropertyValue('--aspect-ratio');
@@ -166,7 +180,7 @@ function initMasonry() {
             item.style.transform = `translate3d(${x}px, ${y}px, 0)`;
             item.classList.add('laid-out');
 
-            colHeights[minCol] += itemHeight + gap;
+            colHeights[col] += itemHeight + gap;
         });
 
         const maxHeight = Math.max(...colHeights);
